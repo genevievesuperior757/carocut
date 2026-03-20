@@ -15,6 +15,11 @@ CaroCut 是端到端的自动化视频生产平台。通过多 Agent 协作（or
 - **Remotion 驱动**：React 组件编程式生成视频，逐帧精确控制
 - **断点续做**：`progress.yaml` 状态持久化，支持中断恢复和增量修改
 
+案例：
+
+- [**从极简主义到极繁主义 - 日式网页为何如此花哨？**](https://www.bilibili.com/video/BV1BMf2B6ECR)
+- [**【论文讲解】Bézier Splatting for Fast and Differentiable Vector Graphics Rendering**](https://www.bilibili.com/video/BV1LHFVz1Ezr)
+
 ## 快速开始
 
 ### 环境要求
