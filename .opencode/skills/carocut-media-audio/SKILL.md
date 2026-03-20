@@ -37,8 +37,6 @@ Processes entire script.md and generates all voiceover files:
 | `zh-CN-XiaoxiaoNeural` | Recommended default voice | General narration, explainers, professional content |
 | any valid Edge voice ID | Direct pass-through | Use when a project requires a specific Microsoft voice |
 
-Legacy aliases such as `girl22`, `girl33`, and `doraemon` remain accepted for backward compatibility, but they normalize to the default Edge voice unless the caller passes a full Edge voice ID.
-
 ### Tone Compatibility
 
 The previous internal TTS backend supported explicit `tone` / `emo_weight` controls. Edge TTS does not expose equivalent emotion labels in this workflow.
