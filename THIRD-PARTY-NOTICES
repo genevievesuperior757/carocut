@@ -1,0 +1,84 @@
+# Third-Party Notices
+
+This document contains license information for third-party software used by 
+CaroCut.
+
+---
+
+## Remotion
+
+**Project**: Remotion - Create videos programmatically in React  
+**Website**: https://remotion.dev  
+**Repository**: https://github.com/remotion-dev/remotion  
+**License**: Remotion Free License / Company License  
+**License File**: https://github.com/remotion-dev/remotion/blob/v4.0.417/LICENSE.md
+
+### Remotion License Summary
+
+Remotion uses a custom, source-available license with commercial restrictions:
+
+#### Free License (No Cost)
+The Free License applies to:
+- Individuals using Remotion for personal projects
+- Non-profit organizations
+- Companies with 3 or fewer employees
+
+#### Company License (Paid)
+A paid Company License is required for:
+- Companies with more than 3 employees
+- Commercial use in larger organizations
+
+#### Key Restrictions
+The Remotion license prohibits:
+- Copying or modifying Remotion code for the purpose of selling, renting, 
+  licensing, relicensing, or sublicensing your own derivative of Remotion
+- Using Remotion in a way that circumvents its licensing requirements
+
+#### Full License Text
+The complete Remotion license can be found at:
+https://github.com/remotion-dev/remotion/blob/v4.0.417/LICENSE.md
+
+### Compliance Requirements for CaroCut Users
+
+When using CaroCut, you are also using Remotion. You must:
+
+1. **Determine your license tier**: Check if you qualify for the Free License 
+   or need a Company License based on your organization size.
+
+2. **Obtain appropriate license**: If you are a company with more than 3 
+   employees, purchase a Company License from https://remotion.dev/license.
+
+3. **Do not relicense Remotion**: This project may depend on Remotion via npm. 
+   Remotion remains under its own license and is not covered by this repo's MIT license.
+
+---
+
+## Other Dependencies
+
+CaroCut also depends on the following open-source packages. Each package 
+is governed by its own license, which can be found in the respective 
+`node_modules/<package>/LICENSE` file:
+
+- **Next.js** - MIT License
+- **React** - MIT License
+- **OpenCode SDK** - MIT License
+- **Python packages** (PyMuPDF, pdfplumber, Pillow, etc.) - Various licenses
+
+For a complete list of dependencies and their licenses, run:
+```bash
+npm list --depth=0
+pnpm list --depth=0
+```
+
+---
+
+## License Compliance
+
+If you have questions about license compliance:
+
+1. **For Remotion**: Contact Remotion directly at https://remotion.dev/license
+2. **For CaroCut**: Open an issue on this repository
+
+---
+
+*This document was created for CaroCut's open-source release. Last updated: 2026*
