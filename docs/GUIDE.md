@@ -1,4 +1,4 @@
-# CaroCut PRO 完整指南
+# CaroCut 完整指南
 
 环境配置、开发规范、工作流使用、素材规范。
 
@@ -63,9 +63,18 @@ source ~/.zshrc
 
 ```bash
 git clone <repository-url>
-cd carocut-pro
+cd carocut
 pnpm install
 cp opencode-template.json opencode.json    # 编辑 provider/apiKey 配置
+```
+
+启动需要两个终端：
+
+```bash
+# 终端 1：启动 OpenCode 后端
+opencode serve --port 4096 --cors http://localhost:3000 --print-logs
+
+# 终端 2：启动前端
 pnpm dev                                   # http://localhost:3000
 ```
 

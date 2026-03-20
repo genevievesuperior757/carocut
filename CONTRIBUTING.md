@@ -22,4 +22,4 @@ pnpm dev
 
 ## 许可证
 
-提交 PR 即同意代码按 [MIT License](LICENSE) 授权。Remotion 有独立的商业许可，详见 [NOTICE](NOTICE)。
+提交 PR 即同意代码按 [MIT License](LICENSE) 授权。

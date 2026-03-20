@@ -1,10 +1,12 @@
-# CaroCut PRO
+# CaroCut
 
 AI 驱动的视频制作工作流系统，基于 OpenCode AI SDK 和 Remotion 构建。
 
 ## 简介
 
 CaroCut 是端到端的自动化视频生产平台。通过多 Agent 协作（orchestrator + planner/media/builder/reviewer），将原始素材（PDF、图片、文本）转化为专业视频。
+
+![demo](./public/demo.png)
 
 核心特性：
 
@@ -26,9 +28,18 @@ CaroCut 是端到端的自动化视频生产平台。通过多 Agent 协作（or
 
 ```bash
 git clone <repository-url>
-cd carocut-pro
+cd carocut/
 pnpm install
 cp opencode-template.json opencode.json  # 编辑配置 API 密钥和模型
+```
+
+启动需要两个终端：
+
+```bash
+# 终端 1：启动 OpenCode 后端
+opencode serve --port 4096 --cors http://localhost:3000 --print-logs
+
+# 终端 2：启动前端
 pnpm dev                                 # 访问 http://localhost:3000
 ```
 
@@ -53,7 +64,7 @@ pnpm dev                                 # 访问 http://localhost:3000
 ## 项目结构
 
 ```
-carocut-pro/
+carocut/
 ├── app/                    # Next.js 应用（页面 + API 路由）
 ├── components/             # React 组件
 ├── lib/                    # 工具函数（studio-manager 等）
@@ -78,7 +89,7 @@ carocut-pro/
 
 MIT License。详见 [LICENSE](./LICENSE)。
 
-**Remotion 许可证**：Remotion 为源码可见项目，个人/非营利/≤3 人公司免费，超 3 人公司商用需购买 [Remotion License](https://remotion.dev/license)。详见 [NOTICE](./NOTICE)、[THIRD-PARTY-NOTICES](./THIRD-PARTY-NOTICES)。
+**Remotion 许可证**：Remotion 为源码可见项目，个人/非营利/≤3 人公司免费，超 3 人公司商用需购买 [Remotion License](https://remotion.dev/license)。详见 [THIRD-PARTY-NOTICES](./THIRD-PARTY-NOTICES)。
 
 ## 致谢
 
