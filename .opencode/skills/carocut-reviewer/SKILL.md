@@ -438,3 +438,4 @@ Before declaring complete:
 - Full render can take 10-30 minutes depending on complexity
 - Output goes to `template-project/out/` by default
 - If render fails partway, check memory usage
+- For remotion API references, see `References Directory` of Skill: carocut-builder-remotion-ref

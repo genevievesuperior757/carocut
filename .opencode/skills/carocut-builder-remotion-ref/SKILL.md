@@ -68,7 +68,7 @@ Comprehensive Remotion API reference with best practices. This skill supplements
 
 ---
 
-## Rules Directory
+## References Directory
 
 Detailed documentation organized by category. Load specific files when needed.
 
@@ -76,74 +76,74 @@ Detailed documentation organized by category. Load specific files when needed.
 
 | Topic | File | When to Use |
 |-------|------|-------------|
-| Compositions | `rules/compositions.md` | Defining compositions, registerRoot |
-| Sequencing | `rules/sequencing.md` | Sequence, Series, TransitionSeries |
-| Timing | `rules/timing.md` | Easing functions, spring config |
-| Animations | `rules/animations.md` | interpolate patterns, motion |
-| Parameters | `rules/parameters.md` | Zod schemas, input props |
-| Calculate Metadata | `rules/calculate-metadata.md` | Dynamic duration/dimensions |
+| Compositions | `references/compositions.md` | Defining compositions, registerRoot |
+| Sequencing | `references/sequencing.md` | Sequence, Series, TransitionSeries |
+| Timing | `references/timing.md` | Easing functions, spring config |
+| Animations | `references/animations.md` | interpolate patterns, motion |
+| Parameters | `references/parameters.md` | Zod schemas, input props |
+| Calculate Metadata | `references/calculate-metadata.md` | Dynamic duration/dimensions |
 
 ### Media Components
 
 | Topic | File | When to Use |
 |-------|------|-------------|
-| Images | `rules/images.md` | Img component, sizing |
-| Videos | `rules/videos.md` | Video component, playback |
-| Audio | `rules/audio.md` | Sound, volume curves, trimming |
-| GIFs | `rules/gifs.md` | Animated GIF playback |
-| Transparent Videos | `rules/transparent-videos.md` | Alpha channel, WebM |
+| Images | `references/images.md` | Img component, sizing |
+| Videos | `references/videos.md` | Video component, playback |
+| Audio | `references/audio.md` | Sound, volume curves, trimming |
+| GIFs | `references/gifs.md` | Animated GIF playback |
+| Transparent Videos | `references/transparent-videos.md` | Alpha channel, WebM |
 
 ### Assets and Resources
 
 | Topic | File | When to Use |
 |-------|------|-------------|
-| Assets | `rules/assets.md` | staticFile, importing |
-| Fonts | `rules/fonts.md` | Google Fonts, local fonts, @font-face |
-| Trimming | `rules/trimming.md` | Cut audio/video start/end |
+| Assets | `references/assets.md` | staticFile, importing |
+| Fonts | `references/fonts.md` | Google Fonts, local fonts, @font-face |
+| Trimming | `references/trimming.md` | Cut audio/video start/end |
 
 ### Text and Typography
 
 | Topic | File | When to Use |
 |-------|------|-------------|
-| Text Animations | `rules/text-animations.md` | Typewriter, word-by-word |
-| Measuring Text | `rules/measuring-text.md` | Text dimensions, overflow |
-| Measuring DOM Nodes | `rules/measuring-dom-nodes.md` | Element size calculation |
+| Text Animations | `references/text-animations.md` | Typewriter, word-by-word |
+| Measuring Text | `references/measuring-text.md` | Text dimensions, overflow |
+| Measuring DOM Nodes | `references/measuring-dom-nodes.md` | Element size calculation |
 
 ### Captions and Subtitles
 
 | Topic | File | When to Use |
 |-------|------|-------------|
-| Subtitles | `rules/subtitles.md` | Caption display basics |
-| Display Captions | `rules/display-captions.md` | Styled caption rendering |
-| Import SRT Captions | `rules/import-srt-captions.md` | Parse SRT files |
-| Transcribe Captions | `rules/transcribe-captions.md` | Audio-to-text |
+| Subtitles | `references/subtitles.md` | Caption display basics |
+| Display Captions | `references/display-captions.md` | Styled caption rendering |
+| Import SRT Captions | `references/import-srt-captions.md` | Parse SRT files |
+| Transcribe Captions | `references/transcribe-captions.md` | Audio-to-text |
 
 ### Visual Effects
 
 | Topic | File | When to Use |
 |-------|------|-------------|
-| Transitions | `rules/transitions.md` | Scene transitions, TransitionSeries |
-| Light Leaks | `rules/light-leaks.md` | Overlay light effects |
-| Lottie | `rules/lottie.md` | After Effects animations |
+| Transitions | `references/transitions.md` | Scene transitions, TransitionSeries |
+| Light Leaks | `references/light-leaks.md` | Overlay light effects |
+| Lottie | `references/lottie.md` | After Effects animations |
 
 ### Data Visualization
 
 | Topic | File | When to Use |
 |-------|------|-------------|
-| Charts | `rules/charts.md` | Recharts integration |
-| Maps | `rules/maps.md` | Mapbox, geographic data |
+| Charts | `references/charts.md` | Recharts integration |
+| Maps | `references/maps.md` | Mapbox, geographic data |
 
 ### Advanced Features
 
 | Topic | File | When to Use |
 |-------|------|-------------|
-| 3D | `rules/3d.md` | Three.js, React Three Fiber |
-| Tailwind | `rules/tailwind.md` | Tailwind CSS integration |
-| Can Decode | `rules/can-decode.md` | Check codec support |
-| Extract Frames | `rules/extract-frames.md` | Get frames from video |
-| Get Video Duration | `rules/get-video-duration.md` | Query video length |
-| Get Video Dimensions | `rules/get-video-dimensions.md` | Query video size |
-| Get Audio Duration | `rules/get-audio-duration.md` | Query audio length |
+| 3D | `references/3d.md` | Three.js, React Three Fiber |
+| Tailwind | `references/tailwind.md` | Tailwind CSS integration |
+| Can Decode | `references/can-decode.md` | Check codec support |
+| Extract Frames | `references/extract-frames.md` | Get frames from video |
+| Get Video Duration | `references/get-video-duration.md` | Query video length |
+| Get Video Dimensions | `references/get-video-dimensions.md` | Query video size |
+| Get Audio Duration | `references/get-audio-duration.md` | Query audio length |
 
 ---
 
@@ -294,6 +294,7 @@ export function safeDuration(frames: number): number {
 | `staticFile not found` | Wrong path | Path relative to public/, case-sensitive |
 | `Render timed out` | delayRender not continued | Call continueRender() |
 | White screen in Studio | Component crash | Check DevTools Console |
+| WebGL render fails | OpenGL flag | Add renderer flag like`--gl angle-egl` |
 
 ---
 
@@ -302,9 +303,6 @@ export function safeDuration(frames: number): number {
 All render output MUST go to the `out/` directory so it appears in the resource panel.
 
 ```bash
-# Development preview
-npm run dev                                      # Opens http://localhost:3000
-
 # Test render (first 10 seconds)
 npx remotion render MyComposition --frames=0-300 out/test.mp4
 

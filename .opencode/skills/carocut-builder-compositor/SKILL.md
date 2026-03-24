@@ -986,7 +986,7 @@ src/
 当前: Shot008_DataVisualization
 
 类型检查: 通过
-预览: npm run dev
+预览: http://localhost:3000
 
 预计剩余: Chapter 2 (5 镜头), Chapter 3 (10 镜头), Chapter 4 (8 镜头)
 ```
@@ -1005,7 +1005,7 @@ src/
 总时长: 7834 帧 (4分21秒 @ 30fps)
 
 类型检查: 通过
-预览: npm run dev -> http://localhost:3000
+预览: http://localhost:3000
 
 准备进入预览审查阶段。
 ```
