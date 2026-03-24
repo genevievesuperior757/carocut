@@ -6,16 +6,19 @@ import Link from "next/link"
 import { useOpenCodeSync } from "@/hooks/use-opencode-sync"
 import { useArtifacts } from "@/hooks/use-artifacts"
 import { useAgentEvents } from "@/hooks/use-agent-events"
+import { useTokenUsage } from "@/hooks/use-token-usage"
 import { ChatPanel } from "@/components/chat/chat-panel"
 import { ArtifactList } from "@/components/artifacts/artifact-list"
 import { DetailPanel } from "@/components/artifacts/detail-panel"
 import { Logo } from "@/components/ui/logo"
+import { TokenUsageMetrics } from "@/components/ui/token-usage-metrics"
 import type { Session } from "@/lib/types"
 
 export default function SessionPage() {
   const { id: sessionId } = useParams<{ id: string }>()
   const sync = useOpenCodeSync(sessionId)
   const artifacts = useArtifacts(sessionId)
+  const tokenUsage = useTokenUsage(sync.messages)
   const [showStudio, setShowStudio] = useState(false)
   const [sessionTitle, setSessionTitle] = useState("")
   const [editingTitle, setEditingTitle] = useState(false)
@@ -125,17 +128,20 @@ export default function SessionPage() {
             )}
           </div>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F1F5F9]">
-          <div
-            className={`w-1.5 h-1.5 rounded-full ${
-              statusType === "busy"
-                ? "bg-[#F97316] animate-pulse"
-                : statusType === "retry"
-                  ? "bg-[#DC2626] animate-pulse"
-                  : "bg-[#10B981]"
-            }`}
-          />
-          <span className="text-xs text-[#475569] capitalize font-medium">{statusType}</span>
+        <div className="flex items-center gap-4">
+          <TokenUsageMetrics usage={tokenUsage} />
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F1F5F9]">
+            <div
+              className={`w-1.5 h-1.5 rounded-full ${
+                statusType === "busy"
+                  ? "bg-[#F97316] animate-pulse"
+                  : statusType === "retry"
+                    ? "bg-[#DC2626] animate-pulse"
+                    : "bg-[#10B981]"
+              }`}
+            />
+            <span className="text-xs text-[#475569] capitalize font-medium">{statusType}</span>
+          </div>
         </div>
       </header>
 
