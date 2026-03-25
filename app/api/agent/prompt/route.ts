@@ -2,10 +2,13 @@ import path from "node:path"
 import { NextRequest, NextResponse } from "next/server"
 import { getClientForWorkspace } from "@/lib/opencode"
 import { createWorkspace } from "@/lib/workspace"
+import { formatError } from "@/lib/api-utils"
+
+const DEFAULT_AGENT = "carocut-orchestrator"
 
 export async function POST(req: NextRequest) {
   try {
-    const { sessionId, parts } = await req.json()
+    const { sessionId, parts, agent } = await req.json()
     if (!sessionId || !parts) {
       return NextResponse.json(
         { error: "Missing sessionId or parts" },
@@ -17,16 +20,14 @@ export async function POST(req: NextRequest) {
     await createWorkspace(sessionId)
     const workspacePath = path.resolve(process.cwd(), "workspaces", sessionId)
 
-    // Use a workspace-aware client so opencode's Instance.directory points to
-    // the session workspace.  This makes bash, write, edit and other file tools
-    // operate inside workspaces/<sessionId> instead of the project root.
     const client = getClientForWorkspace(workspacePath)
     const { error } = await client.session.promptAsync({
       sessionID: sessionId,
       parts,
+      agent: agent || DEFAULT_AGENT
     })
     if (error) {
-      return NextResponse.json({ error: String(error) }, { status: 502 })
+      return NextResponse.json({ error: formatError(error) }, { status: 502 })
     }
     return new NextResponse(null, { status: 204 })
   } catch (err) {

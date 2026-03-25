@@ -79,7 +79,7 @@ export default function SessionPage() {
         artifacts.refreshArtifacts()
       }
     },
-    [artifacts.refreshArtifacts, artifacts.checkStudio], // eslint-disable-line react-hooks/exhaustive-deps
+    [artifacts],
   )
 
   useAgentEvents(sessionId, handleFileEvent)
@@ -147,7 +147,7 @@ export default function SessionPage() {
 
       <div className="flex-1 flex min-h-0">
         <div className="w-[480px] shrink-0 border-r border-[#E2E8F0] bg-white">
-          <ChatPanel sessionId={sessionId} sync={sync} />
+          <ChatPanel sync={sync} />
         </div>
         <div className="w-[280px] shrink-0 border-r border-[#E2E8F0] bg-white">
           <ArtifactList

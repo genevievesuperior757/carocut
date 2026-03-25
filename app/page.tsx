@@ -10,6 +10,7 @@ export default function HomePage() {
   const { sessions, loading, fetchSessions, createSession, updateSession, deleteSession } = useSession()
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editValue, setEditValue] = useState("")
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -17,7 +18,8 @@ export default function HomePage() {
   }, [fetchSessions])
 
   const handleCreate = async () => {
-    const session = await createSession("New Video Project")
+    const { session, error } = await createSession("New Video Project")
+    if (error) { setErrorMsg(error); return }
     if (!session) return
     router.push(`/session/${session.id}`)
   }
@@ -32,7 +34,8 @@ export default function HomePage() {
     if (!editingId) return
     const trimmed = editValue.trim()
     if (trimmed) {
-      await updateSession(editingId, trimmed)
+      const { error } = await updateSession(editingId, trimmed)
+      if (error) setErrorMsg(error)
     }
     setEditingId(null)
   }
@@ -55,6 +58,15 @@ export default function HomePage() {
       </header>
 
       <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-8">
+        {errorMsg && (
+          <div className="mb-4 flex items-center gap-3 rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-4 py-3 text-sm text-[#DC2626]">
+            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+            <span className="flex-1">{errorMsg}</span>
+            <button type="button" onClick={() => setErrorMsg(null)} className="text-[#DC2626] hover:text-[#B91C1C] cursor-pointer">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+            </button>
+          </div>
+        )}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-sm font-semibold text-[#475569] uppercase tracking-wide">项目列表</h2>
           <span className="text-sm text-[#94A3B8] font-medium">{sessions.length}</span>
@@ -127,7 +139,7 @@ export default function HomePage() {
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
                 </button>
                 <button
-                  onClick={(e) => { e.stopPropagation(); deleteSession(s.id) }}
+                  onClick={(e) => { e.stopPropagation(); deleteSession(s.id).then(({ error }) => { if (error) setErrorMsg(error) }) }}
                   className="opacity-0 group-hover:opacity-100 h-8 w-8 flex items-center justify-center rounded-lg text-[#94A3B8] hover:text-[#DC2626] hover:bg-[#FEF2F2] transition-all duration-150 cursor-pointer"
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>

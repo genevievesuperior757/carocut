@@ -15,60 +15,56 @@ export function useSession() {
       const data: Session[] = await res.json()
       setSessions(data)
       return data
-    } catch (err) {
-      console.error("fetchSessions error:", err)
+    } catch {
       return []
     } finally {
       setLoading(false)
     }
   }, [])
 
-  const createSession = useCallback(async (title?: string) => {
+  const createSession = useCallback(async (title?: string): Promise<{ session: Session | null; error?: string }> => {
     try {
       const res = await fetch("/api/agent/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title }),
       })
-      if (!res.ok) throw new Error("Failed to create session")
+      if (!res.ok) throw new Error("无法连接到 OpenCode 后端，请确认服务已启动")
       const session: Session = await res.json()
       setSessions((prev) => [session, ...prev])
-      return session
+      return { session }
     } catch (err) {
-      console.error("createSession error:", err)
-      return null
+      return { session: null, error: err instanceof Error ? err.message : "未知错误" }
     }
   }, [])
 
-  const updateSession = useCallback(async (id: string, title: string) => {
+  const updateSession = useCallback(async (id: string, title: string): Promise<{ session: Session | null; error?: string }> => {
     try {
       const res = await fetch("/api/agent/session", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, title }),
       })
-      if (!res.ok) throw new Error("Failed to update session")
+      if (!res.ok) throw new Error("无法连接到 OpenCode 后端，请确认服务已启动")
       const updated: Session = await res.json()
       setSessions((prev) => prev.map((s) => (s.id === id ? updated : s)))
-      return updated
+      return { session: updated }
     } catch (err) {
-      console.error("updateSession error:", err)
-      return null
+      return { session: null, error: err instanceof Error ? err.message : "未知错误" }
     }
   }, [])
 
-  const deleteSession = useCallback(async (id: string) => {
+  const deleteSession = useCallback(async (id: string): Promise<{ ok: boolean; error?: string }> => {
     try {
       const res = await fetch(
         `/api/agent/session?id=${encodeURIComponent(id)}`,
         { method: "DELETE" },
       )
-      if (!res.ok) throw new Error("Failed to delete session")
+      if (!res.ok) throw new Error("无法连接到 OpenCode 后端，请确认服务已启动")
       setSessions((prev) => prev.filter((s) => s.id !== id))
-      return true
+      return { ok: true }
     } catch (err) {
-      console.error("deleteSession error:", err)
-      return false
+      return { ok: false, error: err instanceof Error ? err.message : "未知错误" }
     }
   }, [])
 

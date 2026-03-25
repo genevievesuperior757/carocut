@@ -282,7 +282,7 @@ export function useOpenCodeSync(sessionId: string | null) {
 
   /** Send a user message. No optimistic update — SSE events drive state. */
   const sendMessage = useCallback(
-    async (text: string, files?: File[]) => {
+    async (text: string, files?: File[], subagent?: string) => {
       if (!sessionId) return
 
       // Upload files first if any
@@ -312,7 +312,14 @@ export function useOpenCodeSync(sessionId: string | null) {
       }
 
       // Build prompt parts
-      const parts: Array<Record<string, unknown>> = [{ type: "text", text }]
+      const parts: Array<Record<string, unknown>> = []
+
+      // Add subagent part if specified (invokes a subagent within the primary agent)
+      if (subagent) {
+        parts.push({ type: "agent", name: subagent })
+      }
+
+      parts.push({ type: "text", text })
       for (const fp of fileParts) {
         parts.push(fp)
       }
@@ -343,6 +350,35 @@ export function useOpenCodeSync(sessionId: string | null) {
         }
       } catch (err) {
         console.error("sendMessage network error:", err)
+        setSessionStatus({ type: "idle" })
+      }
+    },
+    [sessionId],
+  )
+
+  /** Send a slash command to the session */
+  const sendCommand = useCallback(
+    async (command: string, args?: string) => {
+      if (!sessionId) return
+      deltaAccRef.current.clear()
+      setSessionStatus({ type: "busy" })
+      try {
+        const res = await fetch("/api/agent/command", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId, command, args }),
+        })
+        if (!res.ok) {
+          let message = `Command failed (${res.status})`
+          try {
+            const data = (await res.json()) as { error?: string } | null
+            if (data?.error) message = data.error
+          } catch { /* ignore */ }
+          console.error("sendCommand error:", message)
+        }
+        setSessionStatus({ type: "idle" })
+      } catch (err) {
+        console.error("sendCommand network error:", err)
         setSessionStatus({ type: "idle" })
       }
     },
@@ -404,6 +440,7 @@ export function useOpenCodeSync(sessionId: string | null) {
     sessionStatus,
     pendingInteraction,
     sendMessage,
+    sendCommand,
     abortSession,
     replyPermission,
     replyQuestion,

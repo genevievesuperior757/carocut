@@ -1,13 +1,15 @@
+import path from "node:path"
 import { NextRequest, NextResponse } from "next/server"
-import { getClient } from "@/lib/opencode"
+import { getClient, getClientForWorkspace } from "@/lib/opencode"
 import { createWorkspace, deleteWorkspace } from "@/lib/workspace"
+import { formatError } from "@/lib/api-utils"
 
 export async function GET() {
   try {
     const client = getClient()
     const { data, error } = await client.session.list({ roots: true })
     if (error) {
-      return NextResponse.json({ error: String(error) }, { status: 502 })
+      return NextResponse.json({ error: formatError(error) }, { status: 502 })
     }
     return NextResponse.json(data)
   } catch (err) {
@@ -21,17 +23,33 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}))
+    const { title, agent, initialMessage } = body
     const client = getClient()
     const { data, error } = await client.session.create({
-      title: body.title,
+      title,
     })
     if (error || !data) {
       return NextResponse.json(
-        { error: error ? String(error) : "Failed to create session" },
+        { error: error ? formatError(error) : "Failed to create session" },
         { status: 502 },
       )
     }
+
     await createWorkspace(data.id)
+
+    // If agent is specified, send an initial prompt to start that agent
+    if (agent) {
+      const workspacePath = path.resolve(process.cwd(), "workspaces", data.id)
+      const workspaceClient = getClientForWorkspace(workspacePath)
+      const message = initialMessage || `启动 ${agent}，等待用户指令`
+
+      await workspaceClient.session.promptAsync({
+        sessionID: data.id,
+        parts: [{ type: "text", text: message }],
+        agent,
+      })
+    }
+
     return NextResponse.json(data, { status: 201 })
   } catch (err) {
     return NextResponse.json(
@@ -55,7 +73,7 @@ export async function PATCH(req: NextRequest) {
     })
     if (error || !data) {
       return NextResponse.json(
-        { error: error ? String(error) : "Failed to update session" },
+        { error: error ? formatError(error) : "Failed to update session" },
         { status: 502 },
       )
     }
@@ -77,7 +95,7 @@ export async function DELETE(req: NextRequest) {
     const client = getClient()
     const { error } = await client.session.delete({ sessionID: id })
     if (error) {
-      return NextResponse.json({ error: String(error) }, { status: 502 })
+      return NextResponse.json({ error: formatError(error) }, { status: 502 })
     }
     await deleteWorkspace(id)
     return NextResponse.json({ ok: true })

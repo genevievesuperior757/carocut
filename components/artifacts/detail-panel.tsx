@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useReducer } from "react"
 import type { Artifact } from "@/lib/types"
 import { MarkdownViewer } from "./markdown-viewer"
 import { YamlViewer } from "./yaml-viewer"
@@ -15,21 +15,51 @@ interface DetailPanelProps {
   showStudio: boolean
 }
 
+type State = {
+  textContent: string | null
+  loading: boolean
+  error: string | null
+}
+
+type Action =
+  | { type: "RESET" }
+  | { type: "FETCH_START" }
+  | { type: "FETCH_SUCCESS"; payload: string }
+  | { type: "FETCH_ERROR"; payload: string }
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case "RESET":
+      return { textContent: null, loading: false, error: null }
+    case "FETCH_START":
+      return { textContent: null, loading: true, error: null }
+    case "FETCH_SUCCESS":
+      return { textContent: action.payload, loading: false, error: null }
+    case "FETCH_ERROR":
+      return { textContent: null, loading: false, error: action.payload }
+    default:
+      return state
+  }
+}
+
 export function DetailPanel({ artifact, sessionId, showStudio }: DetailPanelProps) {
-  const [textContent, setTextContent] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [state, dispatch] = useReducer(reducer, { textContent: null, loading: false, error: null })
 
   useEffect(() => {
-    setTextContent(null); setError(null)
-    if (!artifact || artifact.type !== "manifest") return
-    let cancelled = false; setLoading(true)
+    if (!artifact || artifact.type !== "manifest") {
+      dispatch({ type: "RESET" })
+      return
+    }
+    let cancelled = false
+    dispatch({ type: "FETCH_START" })
     fetch(`/api/files/assets?sessionId=${encodeURIComponent(sessionId)}&path=${encodeURIComponent(artifact.path)}`)
       .then((res) => { if (!res.ok) throw new Error(`Failed: ${res.status}`); return res.text() })
-      .then((text) => { if (!cancelled) { setTextContent(text); setLoading(false) } })
-      .catch((err) => { if (!cancelled) { setError(err instanceof Error ? err.message : "Failed to load"); setLoading(false) } })
+      .then((text) => { if (!cancelled) dispatch({ type: "FETCH_SUCCESS", payload: text }) })
+      .catch((err) => { if (!cancelled) dispatch({ type: "FETCH_ERROR", payload: err instanceof Error ? err.message : "Failed to load" }) })
     return () => { cancelled = true }
   }, [artifact, sessionId])
+
+  const { textContent, loading, error } = state
 
   if (showStudio) {
     return <div className="flex h-full flex-col bg-[#F8FAFC]"><StudioViewer sessionId={sessionId} onPopout={() => window.open(`/studio-proxy/${sessionId}/`, "_blank")} /></div>

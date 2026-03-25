@@ -1,6 +1,7 @@
 import path from "node:path"
 import { NextRequest, NextResponse } from "next/server"
 import { getClientForWorkspace } from "@/lib/opencode"
+import { formatError } from "@/lib/api-utils"
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,7 +19,7 @@ export async function POST(req: NextRequest) {
       sessionID: sessionId,
     })
     if (error) {
-      return NextResponse.json({ error: String(error) }, { status: 502 })
+      return NextResponse.json({ error: formatError(error) }, { status: 502 })
     }
     return NextResponse.json({ ok: true })
   } catch (err) {

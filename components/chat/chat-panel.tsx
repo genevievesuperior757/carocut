@@ -2,27 +2,32 @@
 
 import { useCallback, useMemo } from "react"
 import type { useOpenCodeSync } from "@/hooks/use-opencode-sync"
+import { useCommands } from "@/hooks/use-commands"
+import { useAgents } from "@/hooks/use-agents"
 import { MessageList } from "./message-list"
 import { ChatInput } from "./chat-input"
 import { PermissionDialog } from "./permission-dialog"
 import { QuestionProvider } from "./question-context"
 
 interface ChatPanelProps {
-  sessionId: string
   sync: ReturnType<typeof useOpenCodeSync>
 }
 
-export function ChatPanel({ sessionId, sync }: ChatPanelProps) {
+export function ChatPanel({ sync }: ChatPanelProps) {
   const {
     messages,
     parts,
     sessionStatus,
     pendingInteraction,
     sendMessage,
+    sendCommand,
     abortSession,
     replyPermission,
     replyQuestion,
   } = sync
+
+  const { commands } = useCommands()
+  const { agents } = useAgents()
 
   const handlePermissionReply = useCallback(
     (reply: "once" | "always" | "reject") => {
@@ -63,8 +68,11 @@ export function ChatPanel({ sessionId, sync }: ChatPanelProps) {
 
       <ChatInput
         onSend={sendMessage}
+        onCommand={sendCommand}
         onAbort={abortSession}
         disabled={sessionStatus.type === "busy"}
+        commands={commands}
+        agents={agents}
       />
     </div>
   )
