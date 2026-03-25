@@ -4,7 +4,6 @@ description: |
   或处理视频素材时使用。协调 planner/media/builder/reviewer 四个
   领域 subagent 完成完整的视频制作流水线。
 mode: primary
-temperature: 0.2
 ---
 
 # CaroCut Orchestrator -- 视频制作工作流编排器

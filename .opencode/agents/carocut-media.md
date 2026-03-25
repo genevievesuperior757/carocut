@@ -4,7 +4,9 @@ description: |
   视觉素材检索与生成（step-4）、音频素材生成与检索（step-5）。
   处理 TTS、图片搜索/生成、BGM/SFX 检索等所有外部 API 调用。
 mode: subagent
-temperature: 0.4
+tools:
+  images_*: true
+  audio_*: true
 ---
 
 # CaroCut Media -- 媒体资源获取与处理

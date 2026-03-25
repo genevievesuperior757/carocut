@@ -11,27 +11,43 @@ Validates system requirements before starting Remotion video production. This st
 
 ### System Tools
 
-| Tool | Minimum Version | Purpose | Installation |
+| Tool | Minimum Version | Purpose | Installation suggestion |
 |------|-----------------|---------|--------------|
 | Node.js | 18.0.0 | Remotion runtime | `brew install node` or nvm |
 | Python | 3.9.0 | Asset processing scripts | `brew install python` |
 | ffmpeg | 4.0.0 | Video encoding, audio conversion | `brew install ffmpeg` |
-| ffprobe | 4.0.0 | Media duration extraction | Included with ffmpeg |
+
+### Python Packages
+
+Create a virtual environment and activate it under the workspace root directory before running the check.
+
+```bash
+cd ${workspace_root}
+# Create and activate virtual environment via uv or python -m venv
+uv venv --python=3.12 --seed
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+The `edge-tts` package is required for text-to-speech conversion.
 
 ### API Keys
+
+Check `${workspace_root}.env` file or environment variables:
 
 | Environment Variable | Purpose | How to Obtain |
 |---------------------|---------|---------------|
 | `PEXELS_API_KEY` | Stock image retrieval | https://www.pexels.com/api/ |
 | `PIXABAY_API_KEY` | Stock image retrieval | https://pixabay.com/api/docs/ |
-| `CARO_LLM_API_KEY` | AI image generation | Custom LLM API |
+| `CARO_LLM_API_KEY` | AI image generation | Custom LLM API for image generation |
 | `FREESOUND_API_KEY` | Sound effects retrieval | https://freesound.org/apiv2/apply/ |
 
+
+```bash
+grep -o -E "(PEXELS|PIXABAY|CARO_LLM|FREESOUND)_API_KEY=.{8}" ${workspace_root}/.env
+```
+
 **Note:** At least one of PEXELS_API_KEY or PIXABAY_API_KEY is required for image retrieval.
-
-### Python Packages
-
-`edge-tts` is required for voiceover generation in step-5.
 
 ### Check Scope
 
@@ -107,9 +123,9 @@ Python 包:
 
 | Issue | Cause | Solution |
 |-------|-------|----------|
-| Node.js version too old | System package manager has outdated version | Use nvm to install Node.js 18+ |
+| Node.js version too old | System package manager has outdated version | Use nvm to install Node.js LTS |
 | ffmpeg not found | Not installed or not in PATH | Install via Homebrew or system package manager |
-| Python packages missing | Virtual environment not activated | Install packages: `pip install openai pillow numpy rembg` |
+| Python packages missing | Virtual environment not activated | Install packages after activating virtual environment: `pip install -r requirements.txt` |
 | API key not found | Environment variable not exported | Add export to shell profile (~/.zshrc or ~/.bashrc) |
 | Windows detected | Windows is not supported | Use macOS or Linux |
 

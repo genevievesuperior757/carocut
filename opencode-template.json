@@ -8,38 +8,37 @@
         "apiKey": "your-api-key-here"
       },
       "models": {
-        "gpt-4o": {},
-        "gpt-4o-mini": {}
+        "gpt-5.4": {},
+        "gpt-5.4-nano": {}
       }
     }
   },
-  "model": "openai/gpt-4o",
+  "model": "openai/gpt-5.4",
+  "small_model": "openai/gpt-5.4-nano",
+  "default_agent": "carocut-orchestrator",
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "reserved": 8000
+  },
   "agent": {
+    "build": {
+      "disable": true
+    },
+    "plan": {
+      "disable": true
+    },
     "carocut-orchestrator": {
-      "mode": "primary",
-      "model": "openai/gpt-4o",
-      "temperature": 1.0,
-      "description": "视频制作工作流编排器。当用户请求制作视频、创建 Remotion 项目、或处理视频素材时使用。协调 planner/media/builder/reviewer 四个领域 subagent 完成完整的视频制作流水线。",
       "tools": {
+        "*": false,
         "write": true,
         "edit": true,
         "read": true,
         "glob": true,
         "skill": true,
         "task": true,
-        "question": true,
-        "bash": false,
-        "env": false,
-        "material": false,
-        "images_search": false,
-        "images_generate": false,
-        "images_remove_bg": false,
-        "audio_batch_tts": false,
-        "audio_tts_single": false,
-        "audio_durations": false,
-        "audio_search_sfx": false,
-        "project_setup": false,
-        "project_migrate": false
+        "list": true,
+        "question": true
       },
       "permission": {
         "task": {
@@ -57,18 +56,18 @@
     },
     "carocut-planner": {
       "mode": "subagent",
-      "model": "openai/gpt-4o",
       "temperature": 1.0,
-      "description": "视频制作的素材分析与策划 subagent。负责环境检查（step-0）、素材解析与清点（step-1）、以及完整的制作策划文档生成（step-2）。",
       "tools": {
+        "*": false,
         "read": true,
         "write": true,
         "edit": true,
         "bash": true,
         "glob": true,
+        "list": true,
         "skill": true,
         "question": true,
-        "task": false
+        "material": true
       },
       "permission": {
         "skill": {
@@ -79,17 +78,17 @@
     },
     "carocut-media": {
       "mode": "subagent",
-      "model": "openai/gpt-4o",
-      "temperature": 1.0,
-      "description": "视频制作的媒体资源获取 subagent。负责脚本润色去 AI 味（step-3）、视觉素材检索与生成（step-4）、音频素材生成与检索（step-5）。",
       "tools": {
+        "*": false,
         "read": true,
         "write": true,
         "edit": true,
         "bash": true,
         "glob": true,
+        "list": true,
         "skill": true,
         "question": true,
+        "webfetch": false,
         "task": false
       },
       "permission": {
@@ -101,18 +100,17 @@
     },
     "carocut-builder": {
       "mode": "subagent",
-      "model": "openai/gpt-4o",
       "temperature": 1.0,
-      "description": "视频制作的 Remotion 工程实现 subagent。负责 Remotion 项目初始化（step-6）、资产管道建设与 TypeScript 映射生成（step-7）、以及 storyboard 到 React 组件的完整实现（step-8）。",
       "tools": {
+        "*": false,
         "read": true,
         "write": true,
         "edit": true,
         "bash": true,
         "glob": true,
+        "list": true,
         "skill": true,
         "question": true,
-        "task": false
       },
       "permission": {
         "skill": {
@@ -123,18 +121,16 @@
     },
     "carocut-reviewer": {
       "mode": "subagent",
-      "model": "openai/gpt-4o",
-      "temperature": 1.0,
-      "description": "视频制作的预览审查与最终渲染 subagent。负责启动 Remotion Studio 预览、根据用户反馈协调修改、调试运行时问题、以及最终渲染输出。",
       "tools": {
+        "*": false,
         "read": true,
         "write": true,
         "edit": true,
         "bash": true,
         "glob": true,
+        "list": true,
         "skill": true,
         "question": true,
-        "task": false
       },
       "permission": {
         "skill": {
@@ -146,18 +142,44 @@
     }
   },
   "permission": {
-    "skill": { "*": "allow" },
-    "bash": { "*": "allow" },
-    "edit": { "*": "allow" },
-    "write": { "*": "allow" },
-    "read": { "*": "allow" },
-    "glob": { "*": "allow" },
-    "grep": { "*": "allow" },
-    "task": { "*": "allow" },
+    "list": "allow",
+    "skill": "allow",
+    "webfetch": "deny",
+    "bash": {
+      "*": "ask",
+      "ffmpeg": "allow",
+      "ffprobe": "allow"
+    },
+    "edit": {
+      "*": "ask",
+      "./workspaces/*": "allow"
+    },
+    "write": {
+      "*": "ask",
+      "./workspaces/*": "allow"
+    },
+    "read": {
+      "*": "ask",
+      "./workspaces/*": "allow"
+    },
+    "glob": {
+      "*": "ask",
+      "./workspaces/*": "allow"
+    },
+    "grep": {
+      "*": "ask",
+      "./workspaces/*": "allow"
+    },
+    "task": {
+      "*": "allow"
+    },
     "question": "allow"
   },
   "server": {
     "port": 4096,
-    "cors": ["http://localhost:3000", "http://0.0.0.0:3000"]
+    "cors": [
+      "http://localhost:3000",
+      "http://0.0.0.0:3000"
+    ]
   }
 }

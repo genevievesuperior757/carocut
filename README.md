@@ -34,6 +34,7 @@ CaroCut 是端到端的自动化视频生产平台。通过多 Agent 协作（or
 ```bash
 git clone <repository-url>
 cd carocut/
+cp .env_example .env # 配置 API 密钥
 pnpm install
 cp opencode-template.json opencode.json  # 编辑配置 API 密钥和模型
 ```

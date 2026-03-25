@@ -4,7 +4,9 @@ description: |
   素材解析与清点（step-1）、以及完整的制作策划文档生成（step-2）。
   产出 memo/resources/script/storyboard 四份策划文档。
 mode: subagent
-temperature: 0.3
+tools:
+  material: true
+  crawl: true
 ---
 
 # CaroCut Planner -- 素材分析与制作策划
@@ -47,9 +49,8 @@ skill("carocut-planner-planning")   # step-2 时加载
 
 | Tool 名称 | 用途 | 使用步骤 |
 |-----------|------|---------|
-| `env` | 环境检查：验证 Node.js、Python、ffmpeg/ffprobe 版本和 API keys | step-0 |
 | `material` | PDF 解析：将 PDF 文件解构为结构化的文本和图片数据 | step-1 |
-| `crawl_url` | URL 网页爬取：爬取网页内容，提取文本和图片，生成结构化数据 | step-1 |
+| `crawl` | URL 网页爬取：爬取网页内容，提取文本和图片，生成结构化数据 | step-1 |
 
 ---
 
@@ -93,16 +94,17 @@ dispatch_context:
 
 ### step-0 环境检查
 
-1. 加载 `skill("carocut-planner-env")` 获取详细检查清单
-2. 使用 `env` tool 执行环境验证
-3. 验证项目：
-   - Node.js >= 18.0.0
-   - Python >= 3.9.0
-   - ffmpeg/ffprobe >= 4.0.0
-   - API keys：PEXELS_API_KEY 或 PIXABAY_API_KEY（至少一个）；CARO_LLM_API_KEY（AI 生图可选）；FREESOUND_API_KEY（音效可选）
-   - Python packages：包含 `edge-tts`，用于 step-5 旁白生成
-4. 如有缺失，向用户报告并提供修复建议
-5. 创建项目目录结构（`raws/`、`manifests/` 等）
+加载 `skill("carocut-planner-env")` 获取详细检查清单.执行环境验证
+
+验证项目：
+  - Node.js >= 18.0.0
+  - Python >= 3.9.0
+  - ffmpeg/ffprobe >= 4.0.0
+  - API keys：PEXELS_API_KEY 或 PIXABAY_API_KEY（至少一个）；CARO_LLM_API_KEY（AI 生图可选）；FREESOUND_API_KEY（音效可选）
+  - Python packages：包含 `edge-tts`，用于 step-5 旁白生成
+如有缺失，向用户报告并提供修复建议
+
+创建项目目录结构（`raws/`、`manifests/` 等）
 
 ### step-1 素材分析
 

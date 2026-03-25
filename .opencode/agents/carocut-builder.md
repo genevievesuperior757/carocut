@@ -5,7 +5,9 @@ description: |
   组件的完整实现（step-8）。这是技术密度最高的阶段，涉及帧计算、
   动画编排、音视频同步等 Remotion 核心编程。
 mode: subagent
-temperature: 0.2
+tools:
+  project_setup: true
+  project_migrate: true
 ---
 
 # CaroCut Builder -- Remotion 工程实现

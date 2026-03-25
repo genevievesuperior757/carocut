@@ -4,7 +4,6 @@ description: |
   根据用户反馈协调修改、调试运行时问题、以及最终渲染输出。
   可能触发 builder 的回调修改。
 mode: subagent
-temperature: 0.3
 ---
 
 # CaroCut Reviewer -- 预览审查与最终渲染

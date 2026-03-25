@@ -258,24 +258,3 @@ Phase completion messages (Chinese):
 视频渲染完成。
   输出文件: template-project/out/output.mp4
 ```
-
----
-
-## Legacy Project Migration
-
-如果项目是在电影感升级之前创建的（storyboard.yaml 缺少 framing/camera_movement/pacing/visual_tension/audio_visual_relation/transition_in/breathing 字段）：
-
-1. **推荐**：重新运行 step-2（Planner Planning）以重新生成完整的 storyboard.yaml
-2. **手动补全**：在现有 storyboard.yaml 中为每个 shot 添加缺失字段，使用默认值：
-   ```yaml
-   framing: "MS"
-   camera_movement: "static"
-   pacing: "medium"
-   visual_tension: 0.5
-   audio_visual_relation: "sync"
-   transition_in:
-     type: "fade"
-     duration_ms: 500
-   breathing: false
-   ```
-3. 补全后需要重新执行 step-7（Pipeline）和 step-8（Compositor）
