@@ -770,9 +770,22 @@ function ToolPartView({ part }: { part: ToolPart }) {
 // ---------------------------------------------------------------------------
 
 function StepFinishView({ part }: { part: StepFinishPart }) {
-  const costStr = part.cost !== undefined ? `$${part.cost.toFixed(4)}` : ""
-  const tokenStr = part.tokens
-    ? `${part.tokens.input + part.tokens.output} tokens`
+  const formatTokenStr = (tokens: number) => {
+    if (tokens === 0) {
+      return "0"
+    }
+    if (tokens > 1000_000) {
+      return `${(tokens / 1000_000).toFixed(2)}M`
+    }
+    if (tokens > 1000) {
+      return `${(tokens / 1000).toFixed(2)}K`
+    }
+    return `${tokens}`
+  }
+  const costStr = part.cost !== undefined && part.cost > 0 ? `$${part.cost.toFixed(4)}` : ""
+  const cacheStr = part.tokens !== undefined && part.tokens.cache && part.tokens.cache.read > 0 ? ` (${formatTokenStr(part.tokens.cache.read)} cache)` : ""
+  const tokenStr = part.tokens !== undefined
+    ? `↑ ${formatTokenStr(part.tokens.input)}${cacheStr} ↓ ${formatTokenStr(part.tokens.output)} tokens`
     : ""
 
   return (
