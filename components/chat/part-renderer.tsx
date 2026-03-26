@@ -45,7 +45,7 @@ function ChevronIcon({ open }: { open: boolean }) {
 function TextPartView({ part, isUser }: { part: TextPart; isUser?: boolean }) {
   if (isUser) {
     return (
-      <div className="text-sm text-white leading-relaxed whitespace-pre-wrap">
+      <div className="text-sm text-white leading-relaxed whitespace-pre-wrap break-words">
         {part.text}
       </div>
     )
@@ -55,7 +55,7 @@ function TextPartView({ part, isUser }: { part: TextPart; isUser?: boolean }) {
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          code({ className, children, ...rest }) {
+          code({ className, children, node, ...rest }) {
             const match = /language-(\w+)/.exec(className || "")
             const codeString = String(children).replace(/\n$/, "")
             if (match) {
@@ -79,6 +79,13 @@ function TextPartView({ part, isUser }: { part: TextPart; isUser?: boolean }) {
               <code className={className} {...rest}>
                 {children}
               </code>
+            )
+          },
+          table({ children }) {
+            return (
+              <div className="overflow-x-auto -mx-3 px-3">
+                <table className="min-w-full">{children}</table>
+              </div>
             )
           },
         }}
@@ -157,7 +164,8 @@ function QuestionToolView({ part }: { part: ToolPart }) {
   // Check if this question tool is the currently pending interactive question
   const isInteractive =
     (state.status === "running" || state.status === "pending") &&
-    pendingInteraction?.kind === "question"
+    pendingInteraction?.kind === "question" &&
+    pendingInteraction.request.tool?.callID === part.callID
 
   const isSingle = questions.length === 1 && !questions[0]?.multiple
 
@@ -581,7 +589,10 @@ function TaskToolView({ part }: { part: ToolPart }) {
               </div>
               <div className="prose prose-sm max-w-none prose-p:text-[#1E293B] prose-p:text-xs prose-p:leading-relaxed">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {(state as ToolStateCompleted).output}
+                  {(state as ToolStateCompleted).output
+                    .replace(/^Result\s*\ntask_id:\s*\S+[^\n]*\n*/m, "")
+                    .replace(/<\/?task_result>/g, "")
+                    .trim()}
                 </ReactMarkdown>
               </div>
             </div>
