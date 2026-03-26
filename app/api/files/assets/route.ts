@@ -58,17 +58,36 @@ export async function GET(req: NextRequest) {
       headers: { "Content-Type": "application/json" },
     })
   }
-
+  // Cache control
   try {
-    const data = await fs.readFile(fullPath)
+    const [data, stat] = await Promise.all([
+      fs.readFile(fullPath),
+      fs.stat(fullPath),
+    ])
     const ext = path.extname(fullPath).toLowerCase()
     const mime = MIME_MAP[ext] || "application/octet-stream"
+
+    const mtime = stat.mtime.getTime().toString(36)
+    const size = stat.size.toString(36)
+    const etag = `"${mtime}-${size}"`
+
+    const ifNoneMatch = req.headers.get("If-None-Match")
+    if (ifNoneMatch === etag) {
+      return new Response(null, {
+        status: 304,
+        headers: {
+          ETag: etag,
+          "Cache-Control": "no-cache",
+        },
+      })
+    }
 
     return new Response(data, {
       status: 200,
       headers: {
         "Content-Type": mime,
-        "Cache-Control": "public, max-age=3600",
+        ETag: etag,
+        "Cache-Control": "no-cache",
       },
     })
   } catch {
