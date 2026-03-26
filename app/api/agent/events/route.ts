@@ -36,8 +36,12 @@ export async function GET(req: NextRequest) {
 
           // Filter events to only those relevant to this session.
           // Events may have sessionID in their properties.
+          // Exception: question/permission events from subagents have different sessionIDs.
           const props = "properties" in event ? event.properties : undefined
+          const eventType = "type" in event ? (event as { type: string }).type : ""
+          const isInteractionEvent = eventType.startsWith("question.") || eventType.startsWith("permission.")
           if (
+            !isInteractionEvent &&
             props &&
             typeof props === "object" &&
             "sessionID" in props &&

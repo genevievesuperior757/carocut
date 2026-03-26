@@ -63,28 +63,51 @@ export default function SessionPage() {
     setEditingTitle(false)
   }
 
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const debouncedRefresh = useCallback(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      artifacts.refreshArtifacts()
+      artifacts.checkStudio()
+    }, 500)
+  }, [artifacts])
+
   const handleFileEvent = useCallback(
     (event: { type: string; properties?: Record<string, unknown> }) => {
       if (event.type === "file.watcher.updated" || event.type === "file.edited") {
         artifacts.refreshArtifacts()
         artifacts.checkStudio()
       }
-      // Also refresh artifacts when agent finishes work (session becomes idle),
-      // to catch files in directories not covered by the file watcher (e.g. out/).
+      // Refresh when a tool call completes — catches files written by external
+      // scripts (Python TTS, image search, etc.) whose output directories live
+      // inside workspaces/ which is gitignored and therefore invisible to the
+      // OpenCode file watcher.
+      if (event.type === "message.part.updated") {
+        const part = (event.properties as { part?: { type?: string; state?: { status?: string } } })?.part
+        if (part?.type === "tool" && part.state?.status === "completed") {
+          debouncedRefresh()
+        }
+      }
+      // Also refresh when session becomes idle.
+      // Note: status is a SessionStatus object ({ type: "idle" }), not a string.
       if (
         event.type === "session.status" &&
         event.properties &&
-        event.properties.status === "idle"
+        (event.properties.status as { type?: string })?.type === "idle"
       ) {
         artifacts.refreshArtifacts()
+        artifacts.checkStudio()
       }
     },
-    [artifacts],
+    [artifacts, debouncedRefresh],
   )
 
   useAgentEvents(sessionId, handleFileEvent)
 
-  const statusType = sync.sessionStatus.type
+  const hasRunningTask = Array.from(sync.parts.values()).some(
+    (ps) => ps.some((p) => p.type === "tool" && "state" in p && (p.state as { status: string }).status === "running"),
+  )
+  const statusType = hasRunningTask ? "busy" : sync.sessionStatus.type
 
   return (
     <div className="h-screen flex flex-col bg-[#F8FAFC]">
@@ -147,7 +170,7 @@ export default function SessionPage() {
 
       <div className="flex-1 flex min-h-0">
         <div className="w-[480px] shrink-0 border-r border-[#E2E8F0] bg-white">
-          <ChatPanel sync={sync} />
+          <ChatPanel sync={sync} sessionId={sessionId} />
         </div>
         <div className="w-[280px] shrink-0 border-r border-[#E2E8F0] bg-white">
           <ArtifactList

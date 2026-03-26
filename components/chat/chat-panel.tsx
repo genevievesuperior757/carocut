@@ -7,13 +7,15 @@ import { useAgents } from "@/hooks/use-agents"
 import { MessageList } from "./message-list"
 import { ChatInput } from "./chat-input"
 import { PermissionDialog } from "./permission-dialog"
+import { QuestionDialog } from "./question-dialog"
 import { QuestionProvider } from "./question-context"
 
 interface ChatPanelProps {
   sync: ReturnType<typeof useOpenCodeSync>
+  sessionId: string
 }
 
-export function ChatPanel({ sync }: ChatPanelProps) {
+export function ChatPanel({ sync, sessionId }: ChatPanelProps) {
   const {
     messages,
     parts,
@@ -59,11 +61,15 @@ export function ChatPanel({ sync }: ChatPanelProps) {
       </div>
 
       <QuestionProvider value={questionCtx}>
-        <MessageList messages={messages} parts={parts} sessionStatus={sessionStatus} />
+        <MessageList messages={messages} parts={parts} sessionStatus={sessionStatus} sessionId={sessionId} />
       </QuestionProvider>
 
       {pendingInteraction?.kind === "permission" && (
         <PermissionDialog request={pendingInteraction.request} onReply={handlePermissionReply} />
+      )}
+
+      {pendingInteraction?.kind === "question" && (
+        <QuestionDialog request={pendingInteraction.request} onReply={handleQuestionReply} />
       )}
 
       <ChatInput

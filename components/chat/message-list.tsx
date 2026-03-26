@@ -8,13 +8,15 @@ interface MessageListProps {
   messages: Message[]
   parts: Map<string, Part[]>
   sessionStatus: SessionStatus
+  sessionId: string
 }
 
-export function MessageList({ messages, parts, sessionStatus }: MessageListProps) {
+export function MessageList({ messages, parts, sessionStatus, sessionId }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null)
-
+  const isBusyRef = useRef<boolean>(false)
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+    isBusyRef.current = sessionStatus.type === "busy"
   }, [messages, parts, sessionStatus])
 
   if (messages.length === 0) {
@@ -38,8 +40,6 @@ export function MessageList({ messages, parts, sessionStatus }: MessageListProps
     )
   }
 
-  const isBusy = sessionStatus.type === "busy"
-
   return (
     <div className="flex-1 overflow-y-auto px-4 py-4">
       <div className="flex flex-col gap-2.5">
@@ -48,9 +48,10 @@ export function MessageList({ messages, parts, sessionStatus }: MessageListProps
             key={msg.id}
             info={msg}
             parts={parts.get(msg.id) ?? []}
+            sessionId={sessionId}
           />
         ))}
-        {isBusy && (
+        {isBusyRef.current && (
           <div className="flex items-center gap-2 py-2 px-1">
             <div className="flex gap-1">
               <span className="w-[5px] h-[5px] rounded-full bg-[#94A3B8] animate-pulse" />

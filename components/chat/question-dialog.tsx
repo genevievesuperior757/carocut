@@ -92,6 +92,9 @@ export function QuestionDialog({ request, onReply }: QuestionDialogProps) {
             </svg>
           </div>
           <span className="text-xs font-semibold text-[#2563EB]">Question</span>
+          {typeof (request as Record<string, unknown>).sessionTitle === "string" && (
+            <span className="text-[10px] text-[#64748B]">from <span className="font-medium text-[#475569]">{(request as Record<string, unknown>).sessionTitle as string}</span></span>
+          )}
         </div>
 
         {/* Tabs (only for multi-question) */}

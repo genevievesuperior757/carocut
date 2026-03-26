@@ -35,7 +35,7 @@ export function useOpenCodeSync(sessionId: string | null) {
   const [messages, setMessages] = useState<Message[]>([])
   const [parts, setParts] = useState<Map<string, Part[]>>(new Map())
   const [sessionStatus, setSessionStatus] = useState<SessionStatus>({ type: "idle" })
-  const [pendingInteraction, setPendingInteraction] = useState<PendingInteraction | null>(null)
+  const [pendingQueue, setPendingQueue] = useState<PendingInteraction[]>([])
 
   // Delta accumulator for streaming text/reasoning parts
   const deltaAccRef = useRef<Map<string, string>>(new Map())
@@ -81,6 +81,25 @@ export function useOpenCodeSync(sessionId: string | null) {
       } catch {
         // Failed to load history, start fresh
       }
+
+      // Restore pending permission/question that may have been lost on refresh
+      try {
+        const pendingRes = await fetch(`/api/agent/pending?sessionId=${encodeURIComponent(sessionId!)}`)
+        if (pendingRes.ok) {
+          const { permissions, questions } = await pendingRes.json()
+          const restored: PendingInteraction[] = []
+          for (const q of questions ?? []) {
+            restored.push({ kind: "question", request: q })
+          }
+          for (const p of permissions ?? []) {
+            restored.push({ kind: "permission", request: p })
+          }
+          if (restored.length) setPendingQueue(restored)
+        }
+      } catch {
+        // Non-critical — SSE will pick up new events
+      }
+
       initializedRef.current = true
     }
 
@@ -95,7 +114,10 @@ export function useOpenCodeSync(sessionId: string | null) {
       // Filter by sessionID if present in event properties
       const props = "properties" in event ? (event.properties as Record<string, unknown>) : null
       const eventSessionId = props?.sessionID as string | undefined
-      if (eventSessionId && sessionId && eventSessionId !== sessionId) return
+      // Don't filter question/permission events by sessionID — subagents have their own sessions
+      const isInteractionEvent = event.type.startsWith("question.") || event.type.startsWith("permission.")
+      if (!isInteractionEvent && eventSessionId && sessionId && eventSessionId !== sessionId) return
+
 
       switch (event.type) {
         // ---------------------------------------------------------------
@@ -226,7 +248,7 @@ export function useOpenCodeSync(sessionId: string | null) {
         // ---------------------------------------------------------------
         case "permission.asked": {
           const request = (event as { properties: import("@opencode-ai/sdk/v2").PermissionRequest }).properties
-          setPendingInteraction({ kind: "permission", request })
+          setPendingQueue(prev => [...prev, { kind: "permission", request }])
           break
         }
 
@@ -237,9 +259,7 @@ export function useOpenCodeSync(sessionId: string | null) {
           const { requestID } = (event as {
             properties: { sessionID: string; requestID: string; reply: string }
           }).properties
-          setPendingInteraction((cur) =>
-            cur?.kind === "permission" && cur.request.id === requestID ? null : cur,
-          )
+          setPendingQueue(prev => prev.filter(p => !(p.kind === "permission" && p.request.id === requestID)))
           break
         }
 
@@ -248,7 +268,7 @@ export function useOpenCodeSync(sessionId: string | null) {
         // ---------------------------------------------------------------
         case "question.asked": {
           const request = (event as { properties: import("@opencode-ai/sdk/v2").QuestionRequest }).properties
-          setPendingInteraction({ kind: "question", request })
+          setPendingQueue(prev => [...prev, { kind: "question", request }])
           break
         }
 
@@ -260,9 +280,7 @@ export function useOpenCodeSync(sessionId: string | null) {
           const { requestID } = (event as {
             properties: { sessionID: string; requestID: string }
           }).properties
-          setPendingInteraction((cur) =>
-            cur?.kind === "question" && cur.request.id === requestID ? null : cur,
-          )
+          setPendingQueue(prev => prev.filter(p => !(p.kind === "question" && p.request.id === requestID)))
           break
         }
 
@@ -433,6 +451,8 @@ export function useOpenCodeSync(sessionId: string | null) {
     },
     [sessionId],
   )
+
+  const pendingInteraction = pendingQueue[0] ?? null
 
   return {
     messages,

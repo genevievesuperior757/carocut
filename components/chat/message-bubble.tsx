@@ -7,10 +7,12 @@ import { LogoIcon } from "@/components/ui/logo"
 interface MessageBubbleProps {
   info: Message
   parts: Part[]
+  sessionId: string
 }
 
-export function MessageBubble({ info, parts }: MessageBubbleProps) {
+export function MessageBubble({ info, parts, sessionId }: MessageBubbleProps) {
   const isUser = info.role === "user"
+  const isSubagent = !isUser && info.sessionID !== sessionId
 
   // For user messages, only render text and file parts
   const visibleParts = isUser
@@ -30,11 +32,13 @@ export function MessageBubble({ info, parts }: MessageBubbleProps) {
         className={`max-w-[85%] rounded-xl px-4 py-3 ${
           isUser
             ? "bg-[#2563EB] text-white"
-            : "bg-[#F1F5F9] border border-[#E2E8F0]"
+            : isSubagent
+              ? "bg-[#F1F5F9] border border-[#E9D5FF]"
+              : "bg-[#F1F5F9] border border-[#E2E8F0]"
         }`}
       >
         {!isUser && (
-          <div className="mb-1.5 text-[10px] font-semibold text-[#64748B] uppercase tracking-wider">
+          <div className={`mb-1.5 text-[10px] font-semibold uppercase tracking-wider ${isSubagent ? "text-[#A855F7]" : "text-[#64748B]"}`}>
             {info.agent || "Assistant"}
           </div>
         )}
