@@ -68,6 +68,22 @@ proxy.on("proxyRes", (proxyRes, req, res) => {
         "XMLHttpRequest.prototype.open=function(m,u){",
         'arguments[1]=typeof u==="string"?f(u):u;',
         "return _xo.apply(this,arguments)};",
+        // Patch HTMLMediaElement.src (audio/video tags)
+        "var _ms=Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype,'src');",
+        "Object.defineProperty(HTMLMediaElement.prototype,'src',{set:function(u){",
+        'return _ms.set.call(this,typeof u==="string"?f(u):u);},get:_ms.get});',
+        // Patch HTMLImageElement.src (img tags)
+        "var _is=Object.getOwnPropertyDescriptor(HTMLImageElement.prototype,'src');",
+        "Object.defineProperty(HTMLImageElement.prototype,'src',{set:function(u){",
+        'return _is.set.call(this,typeof u==="string"?f(u):u);},get:_is.get});',
+        // Patch HTMLScriptElement.src (script tags)
+        "var _ss=Object.getOwnPropertyDescriptor(HTMLScriptElement.prototype,'src');",
+        "Object.defineProperty(HTMLScriptElement.prototype,'src',{set:function(u){",
+        'return _ss.set.call(this,typeof u==="string"?f(u):u);},get:_ss.get});',
+        // Patch HTMLLinkElement.href (link tags for CSS)
+        "var _lh=Object.getOwnPropertyDescriptor(HTMLLinkElement.prototype,'href');",
+        "Object.defineProperty(HTMLLinkElement.prototype,'href',{set:function(u){",
+        'return _lh.set.call(this,typeof u==="string"?f(u):u);},get:_lh.get});',
         // Now set Remotion's visible path to "/" so it auto-selects the first composition
         '_r(null,"","/");',
         "})()</script>",
