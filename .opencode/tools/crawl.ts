@@ -1,18 +1,6 @@
 import { tool } from "@opencode-ai/plugin"
 import path from "path"
-
-async function run(cmd: string[]): Promise<string> {
-  const proc = Bun.spawn(cmd, { stdout: "pipe", stderr: "pipe" })
-  const exitCode = await proc.exited
-  if (exitCode !== 0) {
-    const stderr = await new Response(proc.stderr).text()
-    const error: any = new Error(stderr.trim() || `Process exited with code ${exitCode}`)
-    error.exitCode = exitCode
-    error.stderr = stderr
-    throw error
-  }
-  return new Response(proc.stdout).text()
-}
+import { loadEnv, run } from "./_utils"
 
 export default tool({
   description: `爬取指定 URL 的网页内容，提取文本、图片和表格等结构化数据。
@@ -37,12 +25,14 @@ export default tool({
   },
 
   async execute(args, context) {
+    const env = await loadEnv(context.worktree)
+    
     const script = path.join(context.worktree, ".opencode/scripts/crawl_url.py")
     const cmd = ["python3", script, args.url, "--project-path", args.project_path]
     if (args.download_images === false) cmd.push("--no-download-images")
     if (args.max_images !== undefined) cmd.push("--max-images", String(args.max_images))
     if (args.min_image_size !== undefined) cmd.push("--min-image-size", String(args.min_image_size))
-    const result = await run(cmd)
+    const result = await run(cmd, { env })
     return result.trim()
   },
 })

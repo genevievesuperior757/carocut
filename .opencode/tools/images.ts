@@ -1,18 +1,6 @@
 import { tool } from "@opencode-ai/plugin"
 import path from "path"
-
-async function run(cmd: string[], opts?: { cwd?: string }): Promise<string> {
-  const proc = Bun.spawn(cmd, { ...opts, stdout: "pipe", stderr: "pipe" })
-  const exitCode = await proc.exited
-  if (exitCode !== 0) {
-    const stderr = await new Response(proc.stderr).text()
-    const error: any = new Error(stderr.trim() || `Process exited with code ${exitCode}`)
-    error.exitCode = exitCode
-    error.stderr = stderr
-    throw error
-  }
-  return new Response(proc.stdout).text()
-}
+import { run, loadEnv } from "./_utils"
 
 export const search = tool({
   description: `在 Pexels 和 Pixabay 搜索免费可商用的库存图片。
@@ -39,6 +27,7 @@ export const search = tool({
   },
 
   async execute(args, context) {
+    const env = await loadEnv(context.worktree)
     const script = path.join(context.worktree, ".opencode/scripts/search_images.py")
     const cmd = ["python3", script, "--query", args.query]
     if (args.source) cmd.push("--source", args.source)
@@ -47,7 +36,7 @@ export const search = tool({
     if (args.color) cmd.push("--color", args.color)
     if (args.page) cmd.push("--page", String(args.page))
     if (args.output) cmd.push("--output", args.output)
-    const result = await run(cmd)
+    const result = await run(cmd, { env })
     return result.trim()
   },
 })
@@ -82,6 +71,7 @@ Sprite 模式内置自动验证和重试：生成后检查尺寸是否可被 col
   },
 
   async execute(args, context) {
+    const env = await loadEnv(context.worktree)
     const script = path.join(context.worktree, ".opencode/scripts/generate_image.py")
     const cmd = ["python3", script, "--prompt", args.prompt, "--output", args.output]
     if (args.reference) {
@@ -94,7 +84,7 @@ Sprite 模式内置自动验证和重试：生成后检查尺寸是否可被 col
     if (args.cols) cmd.push("--cols", String(args.cols))
     if (args.rows) cmd.push("--rows", String(args.rows))
     if (args.max_retries) cmd.push("--max-retries", String(args.max_retries))
-    const result = await run(cmd)
+    const result = await run(cmd, { env })
     return result.trim()
   },
 })

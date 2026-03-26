@@ -1,18 +1,6 @@
 import { tool } from "@opencode-ai/plugin"
 import path from "path"
-
-async function run(cmd: string[], opts?: { cwd?: string }): Promise<string> {
-  const proc = Bun.spawn(cmd, { ...opts, stdout: "pipe", stderr: "pipe" })
-  const exitCode = await proc.exited
-  if (exitCode !== 0) {
-    const stderr = await new Response(proc.stderr).text()
-    const error: any = new Error(stderr.trim() || `Process exited with code ${exitCode}`)
-    error.exitCode = exitCode
-    error.stderr = stderr
-    throw error
-  }
-  return new Response(proc.stdout).text()
-}
+import { run, loadEnv } from "./_utils"
 
 export const batch_tts = tool({
   description: `批量生成 TTS 语音文件。解析 script.md 中的 [VO_XXX] 标记段落，
@@ -149,6 +137,7 @@ export const search_sfx = tool({
   },
 
   async execute(args, context) {
+    const env = await loadEnv(context.worktree)
     const script = path.join(context.worktree, ".opencode/scripts/search_sounds.py")
     const cmd = ["python3", script, "--query", args.query]
     if (args.count) cmd.push("--count", String(args.count))
@@ -158,7 +147,7 @@ export const search_sfx = tool({
     if (args.output) cmd.push("--output", args.output)
     if (args.json_output) cmd.push("--json-output", args.json_output)
     if (args.download_original) cmd.push("--download-original")
-    const result = await run(cmd)
+    const result = await run(cmd, { env })
     return result.trim()
   },
 })
