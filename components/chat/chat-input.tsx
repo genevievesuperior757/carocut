@@ -30,6 +30,7 @@ export function ChatInput({ onSend, onCommand, onAbort, disabled, commands = [],
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [autocompleteDismissed, setAutocompleteDismissed] = useState(false)
+  const composingRef = useRef(false)
 
   // Compute autocomplete items based on text input
   const { autocompleteMode, autocompleteItems } = useMemo(() => {
@@ -98,6 +99,7 @@ export function ChatInput({ onSend, onCommand, onAbort, disabled, commands = [],
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLTextAreaElement>) => {
+      if (composingRef.current) return
       if (autocompleteMode !== "none" && autocompleteItems.length > 0) {
         if (e.key === "ArrowDown") {
           e.preventDefault()
@@ -180,7 +182,7 @@ export function ChatInput({ onSend, onCommand, onAbort, disabled, commands = [],
         </div>
       )}
 
-      <div className="flex items-end gap-2">
+      <div className="flex items-center gap-2">
         <input ref={fileInputRef} type="file" multiple className="hidden" onChange={handleFileChange} />
         <button
           type="button" onClick={() => fileInputRef.current?.click()} disabled={disabled}
@@ -194,6 +196,8 @@ export function ChatInput({ onSend, onCommand, onAbort, disabled, commands = [],
           <textarea
             ref={textareaRef} value={text}
             onChange={handleTextChange} onKeyDown={handleKeyDown}
+            onCompositionStart={() => { composingRef.current = true }}
+            onCompositionEnd={() => { composingRef.current = false }}
             disabled={disabled}
             placeholder={placeholder}
             rows={1}
