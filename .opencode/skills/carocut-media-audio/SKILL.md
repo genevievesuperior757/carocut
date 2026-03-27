@@ -34,8 +34,9 @@ Processes entire script.md and generates all voiceover files:
 | Input | Meaning | Recommendation |
 |------|---------|----------------|
 | `default` | Default alias | Maps to `zh-CN-XiaoxiaoNeural` |
-| `zh-CN-XiaoxiaoNeural` | Recommended default voice | General narration, explainers, professional content |
-| any valid Edge voice ID | Direct pass-through | Use when a project requires a specific Microsoft voice |
+| `zh-CN-XiaoxiaoNeural` | Recommended default voice (Female) | General narration, explainers, professional content |
+| `zh-CN-YunxiNeural` | Male | Lively Sunshine |
+| any valid edge-tts voice ID | Direct pass-through | Use when a project requires a specific Microsoft voice |
 
 ### Tone Compatibility
 

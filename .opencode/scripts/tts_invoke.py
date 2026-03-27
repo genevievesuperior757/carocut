@@ -63,7 +63,7 @@ Examples:
         "--character",
         type=str,
         default="default",
-        help='Edge voice ID (recommended, e.g. "zh-CN-XiaoxiaoNeural") or legacy alias',
+        help='Edge voice ID (recommended, e.g. "zh-CN-XiaoxiaoNeural")',
     )
     parser.add_argument(
         "--tone",

@@ -9,7 +9,7 @@ export const batch_tts = tool({
 script.md 格式要求：每段旁白用 **[VO_001]** "文本内容" 或 [VO_001] "文本内容" 标记。
 可用 --start-from 从指定 VO_ID 开始（跳过已生成的），支持断点续做。
 可用 --dry-run 仅解析脚本显示 VO 行数，不实际生成。
-推荐直接传 Edge voice ID，例如 zh-CN-XiaoxiaoNeural。保留兼容旧配置的 legacy alias。
+推荐直接传 Edge voice ID，例如 zh-CN-XiaoxiaoNeural。
 tone 参数仅为兼容保留，当前 Edge TTS 后端会忽略它。`,
 
   args: {
@@ -47,7 +47,7 @@ export const tts_single = tool({
   description: `生成单段 TTS 语音。调用 Edge TTS 生成单条旁白。
 支持通过 speed 控制语速。输出 WAV 格式音频文件。
 退出码含义：0=成功, 1=参数错误, 2=网络错误, 3=超时, 4=服务错误, 5=文件错误。
-推荐直接传 Edge voice ID，例如 zh-CN-XiaoxiaoNeural。legacy alias 仍可兼容使用。`,
+推荐直接传 Edge voice ID，例如 zh-CN-XiaoxiaoNeural。`,
 
   args: {
     text: tool.schema.string().describe("要合成的文本内容"),
