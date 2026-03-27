@@ -36,7 +36,9 @@ export async function POST(req: NextRequest) {
         )
       }
 
-      const [providerID, modelID] = defaultModel.split("/")
+      const slashIdx = defaultModel.indexOf("/")
+      const providerID = slashIdx > 0 ? defaultModel.slice(0, slashIdx) : ""
+      const modelID = slashIdx > 0 ? defaultModel.slice(slashIdx + 1) : ""
       if (!providerID || !modelID) {
         return NextResponse.json(
           { error: `Invalid model format: ${defaultModel}. Expected format: provider/model` },

@@ -1,7 +1,7 @@
 import path from "node:path"
 import { NextRequest, NextResponse } from "next/server"
 import { getClient, getClientForWorkspace } from "@/lib/opencode"
-import { createWorkspace, deleteWorkspace } from "@/lib/workspace"
+import { createWorkspace } from "@/lib/workspace"
 import { formatError } from "@/lib/api-utils"
 
 export async function GET() {
@@ -14,7 +14,7 @@ export async function GET() {
     return NextResponse.json(data)
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Unknown error" },
+      { error: formatError(err) },
       { status: 500 },
     )
   }
@@ -43,65 +43,23 @@ export async function POST(req: NextRequest) {
       const workspaceClient = getClientForWorkspace(workspacePath)
       const message = initialMessage || `启动 ${agent}，等待用户指令`
 
-      await workspaceClient.session.promptAsync({
+      const promptResult = await workspaceClient.session.promptAsync({
         sessionID: data.id,
         parts: [{ type: "text", text: message }],
         agent,
       })
+      if (promptResult.error) {
+        return NextResponse.json(
+          { ...data, warning: `Session created but initial prompt failed: ${formatError(promptResult.error)}` },
+          { status: 201 },
+        )
+      }
     }
 
     return NextResponse.json(data, { status: 201 })
   } catch (err) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Unknown error" },
-      { status: 500 },
-    )
-  }
-}
-
-export async function PATCH(req: NextRequest) {
-  try {
-    const body = await req.json().catch(() => ({}))
-    const { id, title } = body
-    if (!id || typeof title !== "string") {
-      return NextResponse.json({ error: "Missing id or title" }, { status: 400 })
-    }
-    const client = getClient()
-    const { data, error } = await client.session.update({
-      sessionID: id,
-      title,
-    })
-    if (error || !data) {
-      return NextResponse.json(
-        { error: error ? formatError(error) : "Failed to update session" },
-        { status: 502 },
-      )
-    }
-    return NextResponse.json(data)
-  } catch (err) {
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Unknown error" },
-      { status: 500 },
-    )
-  }
-}
-
-export async function DELETE(req: NextRequest) {
-  try {
-    const id = req.nextUrl.searchParams.get("id")
-    if (!id) {
-      return NextResponse.json({ error: "Missing id query param" }, { status: 400 })
-    }
-    const client = getClient()
-    const { error } = await client.session.delete({ sessionID: id })
-    if (error) {
-      return NextResponse.json({ error: formatError(error) }, { status: 502 })
-    }
-    await deleteWorkspace(id)
-    return NextResponse.json({ ok: true })
-  } catch (err) {
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Unknown error" },
+      { error: formatError(err) },
       { status: 500 },
     )
   }

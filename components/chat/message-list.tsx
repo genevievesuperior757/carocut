@@ -13,10 +13,9 @@ interface MessageListProps {
 
 export function MessageList({ messages, parts, sessionStatus, sessionId }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null)
-  const isBusyRef = useRef<boolean>(false)
+  const isBusy = sessionStatus.type === "busy"
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
-    isBusyRef.current = sessionStatus.type === "busy"
   }, [messages, parts, sessionStatus])
 
   if (messages.length === 0) {
@@ -51,7 +50,7 @@ export function MessageList({ messages, parts, sessionStatus, sessionId }: Messa
             sessionId={sessionId}
           />
         ))}
-        {isBusyRef.current && (
+        {isBusy && (
           <div className="flex items-center gap-2 py-2 px-1">
             <div className="flex gap-1">
               <span className="w-[5px] h-[5px] rounded-full bg-[#94A3B8] animate-pulse" />

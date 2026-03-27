@@ -110,7 +110,7 @@
         "glob": true,
         "list": true,
         "skill": true,
-        "question": true,
+        "question": true
       },
       "permission": {
         "skill": {
@@ -130,7 +130,7 @@
         "glob": true,
         "list": true,
         "skill": true,
-        "question": true,
+        "question": true
       },
       "permission": {
         "skill": {
@@ -169,9 +169,6 @@
     "grep": {
       "*": "ask",
       "./workspaces/*": "allow"
-    },
-    "task": {
-      "*": "allow"
     },
     "question": "allow"
   },

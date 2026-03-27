@@ -51,11 +51,20 @@ export function useOpenCodeSync(sessionId: string | null) {
     initializedRef.current = false
     deltaAccRef.current.clear()
 
+    let stale = false
+    const controller = new AbortController()
+
     async function load() {
+      setPendingQueue([])
       try {
-        const res = await fetch(`/api/agent/messages?sessionId=${encodeURIComponent(sessionId!)}`)
+        const res = await fetch(
+          `/api/agent/messages?sessionId=${encodeURIComponent(sessionId!)}`,
+          { signal: controller.signal },
+        )
+        if (stale) return
         if (!res.ok) return
         const data = await res.json()
+        if (stale) return
         if (!Array.isArray(data)) return
 
         const msgs: Message[] = []
@@ -79,14 +88,20 @@ export function useOpenCodeSync(sessionId: string | null) {
         setMessages(msgs)
         setParts(partsMap)
       } catch {
+        if (stale) return
         // Failed to load history, start fresh
       }
 
       // Restore pending permission/question that may have been lost on refresh
       try {
-        const pendingRes = await fetch(`/api/agent/pending?sessionId=${encodeURIComponent(sessionId!)}`)
+        const pendingRes = await fetch(
+          `/api/agent/pending?sessionId=${encodeURIComponent(sessionId!)}`,
+          { signal: controller.signal },
+        )
+        if (stale) return
         if (pendingRes.ok) {
           const { permissions, questions } = await pendingRes.json()
+          if (stale) return
           const restored: PendingInteraction[] = []
           for (const q of questions ?? []) {
             restored.push({ kind: "question", request: q })
@@ -100,10 +115,15 @@ export function useOpenCodeSync(sessionId: string | null) {
         // Non-critical — SSE will pick up new events
       }
 
-      initializedRef.current = true
+      if (!stale) initializedRef.current = true
     }
 
     load()
+
+    return () => {
+      stale = true
+      controller.abort()
+    }
   }, [sessionId])
 
   // -------------------------------------------------------------------
@@ -342,7 +362,7 @@ export function useOpenCodeSync(sessionId: string | null) {
         parts.push(fp)
       }
 
-      // Reset delta accumulator
+      // Clear stale streaming deltas from previous message
       deltaAccRef.current.clear()
 
       // Set busy immediately for UX
@@ -378,7 +398,6 @@ export function useOpenCodeSync(sessionId: string | null) {
   const sendCommand = useCallback(
     async (command: string, args?: string) => {
       if (!sessionId) return
-      deltaAccRef.current.clear()
       setSessionStatus({ type: "busy" })
       try {
         const res = await fetch("/api/agent/command", {
@@ -392,9 +411,10 @@ export function useOpenCodeSync(sessionId: string | null) {
             const data = (await res.json()) as { error?: string } | null
             if (data?.error) message = data.error
           } catch { /* ignore */ }
+          setSessionStatus({ type: "idle" })
           console.error("sendCommand error:", message)
         }
-        setSessionStatus({ type: "idle" })
+        // Don't set idle here — let SSE session.status/session.idle drive it
       } catch (err) {
         console.error("sendCommand network error:", err)
         setSessionStatus({ type: "idle" })

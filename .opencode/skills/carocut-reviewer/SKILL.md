@@ -95,14 +95,12 @@ Execute in order after any code change:
 
 ```bash
 cd template-project
+sh scripts/browser_install.sh
 
 # 1. Type check
 npx tsc --noEmit
 
-# 2. Preview is auto-started by the platform when template-project/node_modules exists.
-#    Do NOT run `npm run dev` manually. The user can view the preview in the resource panel.
-
-# 3. Test render specific range (always output to out/)
+# 2. Test render specific range (always output to out/)
 npx remotion render MyComposition --frames=0-300 out/test.mp4
 ```
 

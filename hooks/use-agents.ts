@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 
 export interface Agent {
   name: string
@@ -53,10 +53,5 @@ export function useAgents() {
     }
   }, [])
 
-  const filterAgents = useCallback((prefix: string): Agent[] => {
-    const lower = prefix.toLowerCase()
-    return globalAgents.filter((agent) => agent.name.toLowerCase().startsWith(lower))
-  }, [])
-
-  return { agents: globalAgents, filterAgents }
+  return { agents: globalAgents }
 }

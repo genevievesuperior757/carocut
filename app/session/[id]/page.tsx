@@ -17,8 +17,11 @@ import type { Session } from "@/lib/types"
 export default function SessionPage() {
   const { id: sessionId } = useParams<{ id: string }>()
   const sync = useOpenCodeSync(sessionId)
-  const artifacts = useArtifacts(sessionId)
+  const { refreshArtifacts, checkStudio, ...artifactRest } = useArtifacts(sessionId)
+  const artifacts = { refreshArtifacts, checkStudio, ...artifactRest }
   const tokenUsage = useTokenUsage(sync.messages)
+  const [subagentByModel, setSubagentByModel] = useState<Record<string, { input: number; output: number; cacheRead: number; cacheWrite: number }>>({})
+
   const [showStudio, setShowStudio] = useState(false)
   const [sessionTitle, setSessionTitle] = useState("")
   const [editingTitle, setEditingTitle] = useState(false)
@@ -31,12 +34,16 @@ export default function SessionPage() {
   }, [sessionId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    fetch(`/api/agent/session`)
+    fetch(`/api/agent/subagent-tokens?sessionId=${encodeURIComponent(sessionId)}`)
       .then((res) => res.json())
-      .then((sessions: Session[]) => {
-        const s = sessions.find((s) => s.id === sessionId)
-        if (s) setSessionTitle(s.title || "")
-      })
+      .then((data) => { if (!data.error) setSubagentByModel(data) })
+      .catch(() => {})
+  }, [sessionId])
+
+  useEffect(() => {
+    fetch(`/api/agent/session/${encodeURIComponent(sessionId)}`)
+      .then((res) => res.json())
+      .then((s: Session) => { if (s?.title) setSessionTitle(s.title) })
       .catch(() => {})
   }, [sessionId])
 
@@ -50,10 +57,10 @@ export default function SessionPage() {
     const trimmed = editValue.trim()
     if (trimmed && trimmed !== sessionTitle) {
       try {
-        const res = await fetch("/api/agent/session", {
+        const res = await fetch(`/api/agent/session/${encodeURIComponent(sessionId)}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: sessionId, title: trimmed }),
+          body: JSON.stringify({ title: trimmed }),
         })
         if (res.ok) {
           setSessionTitle(trimmed)
@@ -67,16 +74,20 @@ export default function SessionPage() {
   const debouncedRefresh = useCallback(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
-      artifacts.refreshArtifacts()
-      artifacts.checkStudio()
+      refreshArtifacts()
+      checkStudio()
     }, 500)
-  }, [artifacts])
+  }, [refreshArtifacts, checkStudio])
+
+  useEffect(() => {
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
+  }, [])
 
   const handleFileEvent = useCallback(
     (event: { type: string; properties?: Record<string, unknown> }) => {
       if (event.type === "file.watcher.updated" || event.type === "file.edited") {
-        artifacts.refreshArtifacts()
-        artifacts.checkStudio()
+        refreshArtifacts()
+        checkStudio()
       }
       // Refresh when a tool call completes — catches files written by external
       // scripts (Python TTS, image search, etc.) whose output directories live
@@ -95,19 +106,16 @@ export default function SessionPage() {
         event.properties &&
         (event.properties.status as { type?: string })?.type === "idle"
       ) {
-        artifacts.refreshArtifacts()
-        artifacts.checkStudio()
+        refreshArtifacts()
+        checkStudio()
       }
     },
-    [artifacts, debouncedRefresh],
+    [refreshArtifacts, checkStudio, debouncedRefresh],
   )
 
   useAgentEvents(sessionId, handleFileEvent)
 
-  const hasRunningTask = Array.from(sync.parts.values()).some(
-    (ps) => ps.some((p) => p.type === "tool" && "state" in p && (p.state as { status: string }).status === "running"),
-  )
-  const statusType = hasRunningTask ? "busy" : sync.sessionStatus.type
+  const statusType = sync.sessionStatus.type
 
   return (
     <div className="h-screen flex flex-col bg-[#F8FAFC]">
@@ -152,7 +160,7 @@ export default function SessionPage() {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <TokenUsageMetrics usage={tokenUsage} />
+          <TokenUsageMetrics usage={tokenUsage} subagentByModel={subagentByModel} />
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F1F5F9]">
             <div
               className={`w-1.5 h-1.5 rounded-full ${

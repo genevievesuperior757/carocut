@@ -5,6 +5,7 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism"
+import Image from "next/image"
 import type {
   Part,
   TextPart,
@@ -663,7 +664,7 @@ function RetryPartView({ part }: { part: RetryPart }) {
       <div className="flex items-center gap-2 text-xs text-[#DC2626]">
         <span className="font-bold">!</span>
         <span>Retry attempt {part.attempt}</span>
-        <span className="text-[#F87171] truncate">{part.error?.data.message ?? ""}</span>
+        <span className="text-[#F87171] truncate">{part.error?.data?.message ?? part.error?.message ?? ""}</span>
       </div>
     </div>
   )
@@ -807,7 +808,7 @@ function FilePartView({ part }: { part: FilePart }) {
   if (isImage) {
     return (
       <div className="rounded-lg overflow-hidden border border-[#E2E8F0] max-w-xs">
-        <img src={part.url} alt={part.filename ?? "image"} className="w-full h-auto" />
+        <Image src={part.url} alt={part.filename ?? "image"} className="w-full h-auto" width={320} height={240} unoptimized />
         {part.filename && (
           <div className="px-2 py-1 text-[10px] text-[#64748B] bg-[#F8FAFC]">
             {part.filename}

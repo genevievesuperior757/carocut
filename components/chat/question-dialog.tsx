@@ -147,7 +147,7 @@ export function QuestionDialog({ request, onReply }: QuestionDialogProps) {
               {isMulti && <span className="text-[#94A3B8] ml-1">(multiple)</span>}
             </p>
 
-            {currentQuestion.options.length > 0 && (
+            {currentQuestion.options && currentQuestion.options.length > 0 && (
               <div className="mb-2 flex flex-col gap-1.5">
                 {currentQuestion.options.map((opt) => {
                   const picked = answers[activeTab]?.includes(opt.label) ?? false

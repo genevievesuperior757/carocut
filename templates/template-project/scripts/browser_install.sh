@@ -91,7 +91,7 @@ else
     echo ""
     echo "请手动下载后重新运行:"
     echo ""
-    echo "  1. 下载: ${DOWNLOAD_URL}"
+    echo "  1. 下载: ${DOWNLOAD_URL} 到 /path/to/${ZIP_NAME}"
     echo "  2. 执行: bash scripts/browser_install.sh /path/to/${ZIP_NAME}"
     echo ""
     exit 1

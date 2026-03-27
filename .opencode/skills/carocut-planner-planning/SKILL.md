@@ -347,7 +347,7 @@ characters:
 |--------|-------------|----------------|
 | `existing` | User-provided in raws/ | Already available |
 | `retrieve` | Stock image/video from Pexels/Pixabay | STEP-4 |
-| `generate` | AI-generated custom image | STEP-4 |
+| `generate` | AI-generated custom image (use ONLY if env `CARO_LLM_API_KEY` available) | STEP-4 |
 
 ---
 

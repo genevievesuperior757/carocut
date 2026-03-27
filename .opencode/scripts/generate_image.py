@@ -40,7 +40,6 @@ SYSTEM_PROMPT_NORMAL = (
     "You are a professional image generation assistant. "
     "Generate the image strictly according to the user's description. "
     "Only output the image, no other content.\n"
-    "The generated image size should be 1024x1024.\n"
     "If you need to draw text in the image, write the text in Chinese."
 )
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 
 export interface Command {
   name: string
@@ -53,10 +53,5 @@ export function useCommands() {
     }
   }, [])
 
-  const filterCommands = useCallback((prefix: string): Command[] => {
-    const lower = prefix.toLowerCase()
-    return globalCommands.filter((cmd) => cmd.name.toLowerCase().startsWith(lower))
-  }, [])
-
-  return { commands: globalCommands, filterCommands }
+  return { commands: globalCommands }
 }

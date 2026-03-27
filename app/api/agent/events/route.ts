@@ -25,14 +25,19 @@ export async function GET(req: NextRequest) {
         }
       }
 
+      // Clean up when client disconnects
+      req.signal.addEventListener("abort", () => close())
+
+      let eventStream: AsyncIterable<unknown> & { return?: () => Promise<unknown> } | null = null
+
       try {
         const workspacePath = path.resolve(process.cwd(), "workspaces", sessionId)
         const client = getClientForWorkspace(workspacePath)
         const result = await client.event.subscribe()
-        const eventStream = result.stream
+        eventStream = result.stream
 
         for await (const event of eventStream) {
-          if (closed) break
+          if (closed || req.signal.aborted) break
 
           // Filter events to only those relevant to this session.
           // Events may have sessionID in their properties.
@@ -61,6 +66,10 @@ export async function GET(req: NextRequest) {
           )
         }
       } finally {
+        // Close upstream event stream to prevent resource leak
+        if (eventStream && typeof eventStream.return === "function") {
+          try { await eventStream.return() } catch { /* ignore close errors */ }
+        }
         close()
       }
     },

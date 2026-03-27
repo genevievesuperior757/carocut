@@ -40,10 +40,10 @@ export function useSession() {
 
   const updateSession = useCallback(async (id: string, title: string): Promise<{ session: Session | null; error?: string }> => {
     try {
-      const res = await fetch("/api/agent/session", {
+      const res = await fetch(`/api/agent/session/${encodeURIComponent(id)}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, title }),
+        body: JSON.stringify({ title }),
       })
       if (!res.ok) throw new Error("无法连接到 OpenCode 后端，请确认服务已启动")
       const updated: Session = await res.json()
@@ -57,7 +57,7 @@ export function useSession() {
   const deleteSession = useCallback(async (id: string): Promise<{ ok: boolean; error?: string }> => {
     try {
       const res = await fetch(
-        `/api/agent/session?id=${encodeURIComponent(id)}`,
+        `/api/agent/session/${encodeURIComponent(id)}`,
         { method: "DELETE" },
       )
       if (!res.ok) throw new Error("无法连接到 OpenCode 后端，请确认服务已启动")
