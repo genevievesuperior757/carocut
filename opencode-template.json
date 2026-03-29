@@ -67,13 +67,15 @@
         "list": true,
         "skill": true,
         "question": true,
-        "material": true
+        "material": true,
+        "websearch": true
       },
       "permission": {
         "skill": {
           "*": "deny",
           "carocut-planner-*": "allow"
-        }
+        },
+        "websearch": "allow"
       }
     },
     "carocut-media": {
@@ -88,6 +90,7 @@
         "list": true,
         "skill": true,
         "question": true,
+        "websearch": true,
         "webfetch": false,
         "task": false
       },
@@ -95,7 +98,8 @@
         "skill": {
           "*": "deny",
           "carocut-media-*": "allow"
-        }
+        },
+        "websearch": "allow"
       }
     },
     "carocut-builder": {
@@ -145,6 +149,7 @@
     "list": "allow",
     "skill": "allow",
     "webfetch": "deny",
+    "websearch": "allow",
     "bash": {
       "*": "ask",
       "ffmpeg": "allow",

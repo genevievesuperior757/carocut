@@ -58,7 +58,7 @@
 
 环境验证 → 素材解析（PDF/图片/文本 → data.json + inventory.yaml） → 策划文档（memo/resources/script/storyboard）
 
-Skills: `carocut-planner-env`, `carocut-planner-analysis`, `carocut-planner-planning`
+Skills: `carocut-planner-analysis`, `carocut-planner-planning`
 
 ### Media (Step 3-5)
 
@@ -66,13 +66,13 @@ Skills: `carocut-planner-env`, `carocut-planner-analysis`, `carocut-planner-plan
 
 Skills: `carocut-media-humanizer`, `carocut-media-visual`, `carocut-media-audio`
 
-### Builder (Step 6-8)
+### Builder (Step 6-7)
 
-Remotion 项目初始化 → 资产迁移（resourceMap.ts/constants.ts/timing.ts） → Shot 组件 + Composition 实现
+额外包检测 → 资产迁移（resourceMap.ts/constants.ts/timing.ts） → Shot 组件 + Composition 实现
 
 Skills: `carocut-builder-setup`, `carocut-builder-pipeline`, `carocut-builder-compositor`, `carocut-builder-remotion-ref`
 
-### Reviewer (Step 9)
+### Reviewer (Step 8)
 
 Studio 预览 → 用户反馈迭代 → 最终渲染
 

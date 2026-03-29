@@ -149,13 +149,11 @@ Setup → Planning → Enhancement → Implementation → Delivery
 
 **Step 5 音频素材** — Edge TTS 旁白、BGM、SFX
 
-**Step 6 Remotion 初始化** — 创建 `template-project/`，安装依赖
+**Step 6 资产管道** — 检测额外包需求 → 素材迁移到 Remotion 项目，生成 `resourceMap.ts` / `constants.ts` / `timing.ts`
 
-**Step 7 资产管道** — 素材迁移到 Remotion 项目，生成 `resourceMap.ts` / `constants.ts` / `timing.ts`
+**Step 7 组件实现** — 根据 storyboard 实现 Shot 组件 + Composition
 
-**Step 8 组件实现** — 根据 storyboard 实现 Shot 组件 + Composition
-
-**Step 9 预览渲染** — Remotion Studio 预览 → 用户审查迭代 → 最终渲染 `output.mp4`
+**Step 8 预览渲染** — Remotion Studio 预览 → 用户审查迭代 → 最终渲染 `output.mp4`
 
 ### 断点续做
 

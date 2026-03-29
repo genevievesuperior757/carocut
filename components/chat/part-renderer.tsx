@@ -664,7 +664,7 @@ function RetryPartView({ part }: { part: RetryPart }) {
       <div className="flex items-center gap-2 text-xs text-[#DC2626]">
         <span className="font-bold">!</span>
         <span>Retry attempt {part.attempt}</span>
-        <span className="text-[#F87171] truncate">{part.error?.data?.message ?? part.error?.message ?? ""}</span>
+        <span className="text-[#F87171] truncate">{part.error?.data?.message ?? ""}</span>
       </div>
     </div>
   )

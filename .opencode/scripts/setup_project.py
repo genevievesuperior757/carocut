@@ -26,6 +26,8 @@ from typing import List, Optional
 
 # Template source directory (bundled in repo)
 TEMPLATE_DIR = Path(__file__).resolve().parent.parent.parent / "templates" / "template-project"
+WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
+CACHE_DIR = WORKSPACE_ROOT / ".carocut" / "template-cache"
 
 # Extra package mappings
 EXTRA_PACKAGES = {
@@ -68,6 +70,21 @@ def copy_template(output_dir: str) -> None:
     print(f"Copying template from {TEMPLATE_DIR}...")
     shutil.copytree(str(TEMPLATE_DIR), output_dir)
     print(f"Template copied to {output_dir}")
+
+
+def copy_from_cache(output_dir: str) -> bool:
+    """Copy from pre-installed cache. Returns True if successful."""
+    if not CACHE_DIR.is_dir():
+        return False
+
+    node_modules = CACHE_DIR / "node_modules"
+    if not node_modules.is_dir():
+        return False
+
+    print(f"Copying from cache {CACHE_DIR}...")
+    shutil.copytree(str(CACHE_DIR), output_dir, symlinks=True)
+    print(f"Project initialized from cache to {output_dir}")
+    return True
 
 
 def install_dependencies(project_dir: str) -> None:
@@ -152,17 +169,20 @@ def main():
         sys.exit(1)
 
     try:
-        # Step 1: Copy template
-        copy_template(args.output)
+        # Try cache first
+        used_cache = copy_from_cache(args.output)
 
-        # Step 2: Install dependencies
-        install_dependencies(args.output)
+        if not used_cache:
+            # Fallback: Copy template and install from scratch
+            copy_template(args.output)
+            install_dependencies(args.output)
 
-        # Step 3: Install browser
-        if not args.skip_browser:
-            install_browser(args.output)
+            if not args.skip_browser:
+                install_browser(args.output)
+        else:
+            print("Using cached template (dependencies and browser already installed)")
 
-        # Step 4: Install extras
+        # Install extras if needed
         if args.extras:
             extras = [e.strip() for e in args.extras.split(",")]
             install_extras(args.output, extras)

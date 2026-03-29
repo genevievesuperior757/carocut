@@ -11,7 +11,8 @@ CaroCut 是端到端的自动化视频生产平台。通过多 Agent 协作（or
 核心特性：
 
 - **多 Agent 协作**：5 个专业 Agent，12 个 Skill，职责隔离
-- **10 步标准工作流**：环境检查 → 素材分析 → 策划 → 脚本润色 → 视觉素材 → 音频素材 → Remotion 初始化 → 资产管道 → 组件实现 → 预览渲染
+- **8 步标准工作流**：素材分析 → 策划 → 脚本润色 → 视觉素材 → 音频素材 → 资产管道 → 组件实现 → 预览渲染
+- **自动化环境初始化**：Bootstrap 一次，多项目共享 Remotion 模板和浏览器（session 创建时自动兜底）
 - **Remotion 驱动**：React 组件编程式生成视频，逐帧精确控制
 - **断点续做**：`progress.yaml` 状态持久化，支持中断恢复和增量修改
 
@@ -25,9 +26,10 @@ CaroCut 是端到端的自动化视频生产平台。通过多 Agent 协作（or
 ### 环境要求
 
 - macOS / Linux（不支持 Windows，需用 WSL2）
-- Node.js >= 18, Python >= 3.9, ffmpeg
-- API 密钥：PEXELS_API_KEY（必需），PIXABAY_API_KEY / CARO_LLM_API_KEY / FREESOUND_API_KEY（可选）
-- Python 包：`pip3 install -r requirements.txt`（含 edge-tts）
+- Node.js >= 18, Python >= 3.9, [uv](https://docs.astral.sh/uv/)（Python 包管理）, ffmpeg
+- API 密钥：
+  - **必需**：PEXELS_API_KEY
+  - **可选**：PIXABAY_API_KEY, CARO_LLM_API_KEY, FREESOUND_API_KEY
 
 ### 安装与启动
 
@@ -35,18 +37,38 @@ CaroCut 是端到端的自动化视频生产平台。通过多 Agent 协作（or
 git clone <repository-url>
 cd carocut/
 cp .env_example .env # 配置 API 密钥
+
+# Python 环境（使用 uv 管理）
+uv venv
+source .venv/bin/activate  # macOS/Linux
+uv pip install -r requirements.txt
+
+# Node.js 依赖
 pnpm install
+
+# OpenCode 配置
 cp opencode-template.json opencode.json  # 编辑配置 API 密钥和模型
+
+# Bootstrap：全局环境初始化（首次运行）
+python .opencode/scripts/bootstrap.py
 ```
 
-启动需要两个终端：
+Bootstrap 会执行：
+- 环境检查（Node.js、Python、ffmpeg、API keys）
+- Remotion 模板缓存准备（~700MB，所有项目共享）
+- Chrome headless shell 下载
+
+启动需要两个终端（**重要：在 venv 下执行**）：
 
 ```bash
-# 终端 1：启动 OpenCode 后端
-opencode serve --port 4096 --cors http://localhost:3000 --print-logs
+# 激活虚拟环境（如未激活）
+source .venv/bin/activate  # macOS/Linux
+
+# 终端 1：启动 OpenCode 后端（启用 Web 搜索）
+OPENCODE_ENABLE_EXA=1 opencode serve --port 4096 --cors http://localhost:3000 --print-logs
 
 # 终端 2：启动前端
-pnpm dev                                 # 访问 http://localhost:3000
+pnpm dev  # 访问 http://localhost:3000
 ```
 
 ### 启动工作流
@@ -61,11 +83,10 @@ pnpm dev                                 # 访问 http://localhost:3000
 
 | 阶段 | 步骤 | Agent | 描述 |
 |------|------|-------|------|
-| Setup | step-0 | planner | 环境检查 |
 | Planning | step-1, 2 | planner | 素材分析、制作策划 |
 | Enhancement | step-3, 4, 5 | media | 脚本润色、视觉素材、音频素材 |
-| Implementation | step-6, 7, 8 | builder | Remotion 初始化、资产管道、组件实现 |
-| Delivery | step-9 | reviewer | 预览审查、最终渲染 |
+| Implementation | step-6, 7 | builder | 资产管道、组件实现 |
+| Delivery | step-8 | reviewer | 预览审查、最终渲染 |
 
 ## 项目结构
 

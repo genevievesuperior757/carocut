@@ -1,5 +1,6 @@
 import path from "node:path"
 import fs from "node:fs/promises"
+import { checkBootstrap, runBootstrap } from "./bootstrap"
 
 const WORKSPACES_ROOT = path.join(process.cwd(), "workspaces")
 
@@ -13,7 +14,40 @@ export async function createWorkspace(sessionId: string): Promise<string> {
   await fs.mkdir(path.join(dir, "raws", "audio", "vo"), { recursive: true })
   await fs.mkdir(path.join(dir, "manifests"), { recursive: true })
   await fs.mkdir(path.join(dir, "outputs"), { recursive: true })
+
+  // Bootstrap check (global, runs once)
+  const isBootstrapped = await checkBootstrap()
+  if (!isBootstrapped) {
+    const result = await runBootstrap()
+    if (!result.success) {
+      throw new Error(result.message)
+    }
+  }
+
+  // Project setup (per-project, copies from cache)
+  await setupProject(dir)
+
   return dir
+}
+
+async function setupProject(projectDir: string): Promise<void> {
+  // Skip if template-project already exists (resume mode)
+  const templateDir = path.join(projectDir, "template-project")
+  try {
+    await fs.access(templateDir)
+    return // Already exists, skip setup
+  } catch {
+    // Directory doesn't exist, proceed with setup
+  }
+
+  const { exec } = await import("node:child_process")
+  const { promisify } = await import("node:util")
+  const execAsync = promisify(exec)
+
+  const script = path.join(process.cwd(), ".opencode/scripts/setup_project.py")
+  const cmd = `python3 "${script}" --output template-project --skip-verify`
+
+  await execAsync(cmd, { cwd: projectDir })
 }
 
 export function getWorkspacePath(sessionId: string): string {

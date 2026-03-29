@@ -203,9 +203,22 @@ def check_package_manager() -> CheckResult:
     )
 
 
-def check_env_var(name: str, purpose: str, required: bool = False) -> CheckResult:
-    """Check if environment variable is set."""
-    value = os.environ.get(name)
+def load_env_file(env_path: str = ".env") -> dict:
+    """Load environment variables from .env file."""
+    env_vars = {}
+    if os.path.exists(env_path):
+        with open(env_path, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    env_vars[key.strip()] = value.strip().strip('"').strip("'")
+    return env_vars
+
+
+def check_env_var(name: str, purpose: str, required: bool = False, env_vars: dict = None) -> CheckResult:
+    """Check if environment variable is set (from os.environ or .env file)."""
+    value = os.environ.get(name) or (env_vars or {}).get(name)
     category = "required_api" if required else "optional_api"
 
     if value:
@@ -215,7 +228,7 @@ def check_env_var(name: str, purpose: str, required: bool = False) -> CheckResul
     return CheckResult(
         name, Status.MISSING,
         message=purpose,
-        install_command=f'export {name}="your_key"',
+        install_command=f'Add {name}="your_key" to .env file',
         category=category
     )
 
@@ -244,9 +257,12 @@ def check_python_package(name: str, import_name: Optional[str] = None) -> CheckR
     )
 
 
-def run_full_check() -> EnvCheckReport:
+def run_full_check(env_file: str = ".env") -> EnvCheckReport:
     """Run all environment checks."""
     report = EnvCheckReport()
+
+    # Load .env file from workspace root
+    env_vars = load_env_file(env_file)
 
     # OS Check
     os_result = check_os()
@@ -260,9 +276,9 @@ def run_full_check() -> EnvCheckReport:
     report.results.append(check_ffprobe())
     report.results.append(check_package_manager())
 
-    # Environment Variables
-    pexels = check_env_var("PEXELS_API_KEY", "Image retrieval (Pexels)", required=False)
-    pixabay = check_env_var("PIXABAY_API_KEY", "Image retrieval (Pixabay)", required=False)
+    # Environment Variables (check os.environ + .env file)
+    pexels = check_env_var("PEXELS_API_KEY", "Image retrieval (Pexels)", required=False, env_vars=env_vars)
+    pixabay = check_env_var("PIXABAY_API_KEY", "Image retrieval (Pixabay)", required=False, env_vars=env_vars)
 
     if pexels.status != Status.OK and pixabay.status != Status.OK:
         pexels.category = "required_api"
@@ -270,8 +286,8 @@ def run_full_check() -> EnvCheckReport:
 
     report.results.append(pexels)
     report.results.append(pixabay)
-    report.results.append(check_env_var("CARO_LLM_API_KEY", "Recommended: AI image generation (step-4)", required=False))
-    report.results.append(check_env_var("FREESOUND_API_KEY", "Recommended: BGM/SFX retrieval (step-5)", required=False))
+    report.results.append(check_env_var("CARO_LLM_API_KEY", "Recommended: AI image generation (step-4)", required=False, env_vars=env_vars))
+    report.results.append(check_env_var("FREESOUND_API_KEY", "Recommended: BGM/SFX retrieval (step-5)", required=False, env_vars=env_vars))
 
     # Python Packages
     packages = [
@@ -365,9 +381,10 @@ def main():
     parser = argparse.ArgumentParser(description="Environment validation for Remotion video production")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
     parser.add_argument("--quiet", "-q", action="store_true", help="Only show errors")
+    parser.add_argument("--env-file", default=".env", help="Path to .env file (default: .env in cwd)")
     args = parser.parse_args()
 
-    report = run_full_check()
+    report = run_full_check(env_file=args.env_file)
 
     if args.json:
         print(format_report_json(report))
