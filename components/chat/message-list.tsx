@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState, useCallback } from "react"
 import type { Message, Part, SessionStatus } from "@/lib/types"
 import { MessageBubble } from "./message-bubble"
 
@@ -13,10 +13,25 @@ interface MessageListProps {
 
 export function MessageList({ messages, parts, sessionStatus, sessionId }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [isAtBottom, setIsAtBottom] = useState(true)
   const isBusy = sessionStatus.type === "busy"
+
+  // 检测用户是否在底部（允许50px误差容忍）
+  const handleScroll = useCallback(() => {
+    const container = containerRef.current
+    if (!container) return
+    const { scrollTop, scrollHeight, clientHeight } = container
+    const atBottom = scrollHeight - scrollTop - clientHeight < 50
+    setIsAtBottom(atBottom)
+  }, [])
+
+  // 只有当用户在底部时才自动滚动
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages, parts, sessionStatus])
+    if (isAtBottom) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+    }
+  }, [messages, parts, sessionStatus, isAtBottom])
 
   if (messages.length === 0) {
     return (
@@ -40,7 +55,7 @@ export function MessageList({ messages, parts, sessionStatus, sessionId }: Messa
   }
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-4">
+    <div ref={containerRef} onScroll={handleScroll} className="flex-1 overflow-y-auto px-4 py-4">
       <div className="flex flex-col gap-2.5">
         {messages.map((msg) => (
           <MessageBubble
