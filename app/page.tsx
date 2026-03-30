@@ -13,6 +13,7 @@ export default function HomePage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [creating, setCreating] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -20,9 +21,11 @@ export default function HomePage() {
   }, [fetchSessions])
 
   const handleCreate = async () => {
+    if (creating) return
+    setCreating(true)
     const { session, error } = await createSession("New Video Project")
-    if (error) { setErrorMsg(error); return }
-    if (!session) return
+    if (error) { setCreating(false); setErrorMsg(error); return }
+    if (!session) { setCreating(false); return }
     router.push(`/session/${session.id}`)
   }
 
@@ -163,6 +166,15 @@ export default function HomePage() {
           ))}
         </div>
       </main>
+
+      {creating && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-xl flex flex-col items-center gap-3">
+            <div className="w-8 h-8 border-2 border-[#E2E8F0] border-t-[#2563EB] rounded-full animate-spin" />
+            <p className="text-sm text-[#475569] font-medium">正在创建项目…</p>
+          </div>
+        </div>
+      )}
 
       {deletingId && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => !deleting && setDeletingId(null)}>
