@@ -48,6 +48,14 @@
           "carocut-builder": "allow",
           "carocut-reviewer": "allow"
         },
+        "write": {
+          "*": "deny",
+          "**/manifests/progress.yaml": "allow"
+        },
+        "edit": {
+          "*": "deny",
+          "**/manifests/progress.yaml": "allow"
+        },
         "skill": {
           "*": "deny",
           "carocut-orchestrator": "allow"
@@ -75,7 +83,17 @@
           "*": "deny",
           "carocut-planner-*": "allow"
         },
-        "websearch": "allow"
+        "websearch": "allow",
+        "write": {
+          "*": "deny",
+          "**/manifests/*.md": "allow",
+          "**/manifests/storyboard.yaml": "allow"
+        },
+        "edit": {
+          "*": "deny",
+          "**/manifests/*.md": "allow",
+          "**/manifests/storyboard.yaml": "allow"
+        }
       }
     },
     "carocut-media": {
@@ -91,7 +109,7 @@
         "skill": true,
         "question": true,
         "websearch": true,
-        "webfetch": false,
+        "webfetch": true,
         "task": false
       },
       "permission": {

@@ -114,7 +114,7 @@ export const durations = tool({
 export const search_sfx = tool({
   description: `在 Freesound 搜索免费音效和背景音乐。
 支持按关键词搜索、时长筛选、许可证过滤。
-可仅返回搜索结果（JSON），或直接下载到指定目录。
+可仅返回搜索结果（JSON），或直接下载预览文件（高质量 MP3）到指定目录。
 许可证选项：cc0（公共领域，最安全）、cc-by（需署名）、all（所有）。
 需要环境变量：FREESOUND_API_KEY。`,
 
@@ -132,8 +132,6 @@ export const search_sfx = tool({
       .describe("下载目录绝对路径（指定后自动下载）"),
     json_output: tool.schema.string().optional()
       .describe("搜索结果保存为 JSON 文件的路径"),
-    download_original: tool.schema.boolean().optional()
-      .describe("下载原始文件而非预览文件，默认 false"),
   },
 
   async execute(args, context) {
@@ -146,7 +144,6 @@ export const search_sfx = tool({
     if (args.max_duration) cmd.push("--max-duration", String(args.max_duration))
     if (args.output) cmd.push("--output", args.output)
     if (args.json_output) cmd.push("--json-output", args.json_output)
-    if (args.download_original) cmd.push("--download-original")
     const result = await run(cmd, { env })
     return result.trim()
   },

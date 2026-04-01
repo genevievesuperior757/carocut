@@ -1,6 +1,6 @@
 ---
 description: |
-  预览审查与最终渲染 subagent。负责启动预览、收集反馈、分类处理问题、
+  Review Remotion 工程，预览审查与最终渲染 subagent。负责启动预览、收集反馈、分类处理问题、
   调试运行时错误、最终渲染输出。
 mode: subagent
 ---

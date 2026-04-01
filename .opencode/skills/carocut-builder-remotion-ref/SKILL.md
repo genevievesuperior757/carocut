@@ -49,7 +49,7 @@ Comprehensive Remotion API reference with best practices. This skill supplements
 
 | Component | Props | Purpose |
 |-----------|-------|---------|
-| `<Sequence>` | `from`, `durationInFrames`, `premountFor` | Time-based children |
+| `<Sequence>` | `from`, `durationInFrames`, `premountFor`, `name` | Time-based children |
 | `<Series>` | children | Sequential playback |
 | `<AbsoluteFill>` | style | Full-frame container |
 | `<Img>` | `src` | Image (use with staticFile) |
@@ -233,7 +233,7 @@ const fadeOutFrames = 90; // 3 seconds
 // Absolute positioning - NOT nested Sequences
 const voStartFrame = computeShotStartFrame('shot_005') + msToFrames(200);
 
-<Sequence from={voStartFrame} durationInFrames={msToFrames(voDuration)}>
+<Sequence from={voStartFrame} durationInFrames={msToFrames(voDuration)} name="Shot-005">
   <Audio src={staticFile('audio/vo/VO_005.wav')} />
 </Sequence>
 ```

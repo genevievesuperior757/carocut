@@ -11,9 +11,9 @@ Generates voiceovers via TTS, retrieves background music and sound effects. Crea
 
 | Type | Source | Output Directory |
 |------|--------|------------------|
-| Voiceover (VO) | Edge TTS | `raws/audio/vo/` |
-| Background Music (BGM) | Freesound | `raws/audio/bgm/` |
-| Sound Effects (SFX) | Freesound | `raws/audio/sfx/` |
+| Voiceover (VO) | Edge TTS | `{project_dir}/raws/audio/vo/` |
+| Background Music (BGM) | Freesound | `{project_dir}/raws/audio/bgm/` |
+| Sound Effects (SFX) | Freesound | `{project_dir}/raws/audio/sfx/` |
 
 ---
 
@@ -24,10 +24,10 @@ Generate speech audio from script using Edge TTS.
 ### TTS Batch Processing Workflow
 
 Processes entire script.md and generates all voiceover files:
-1. Parse `manifests/script.md` for all `[VO_XXX]` markers and their text content
+1. Parse `{project_dir}/manifests/script.md` for all `[VO_XXX]` markers and their text content
 2. For each VO segment, invoke Edge TTS with the configured voice and speed
-3. Save each result as `VO_XXX.wav` in `raws/audio/vo/`
-4. After all segments complete, extract durations to create `durations.json`
+3. Save each result as `VO_XXX.wav` in `{project_dir}/raws/audio/vo/`
+4. After all segments complete, extract durations to create `{project_dir}/manifests/durations.json`
 
 ### Voice Selection
 

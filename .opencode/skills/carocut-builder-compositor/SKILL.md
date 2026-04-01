@@ -86,7 +86,7 @@ import {
 **Storyboard 映射:** `camera_movement` → `effect`（`static` 时不使用 KenBurns）
 
 ```tsx
-<Sequence from={startFrame} durationInFrames={duration}>
+<Sequence from={startFrame} durationInFrames={duration} name="Shot-No.">
   <KenBurns src={IMAGES.hero} effect="zoom-in" />
 </Sequence>
 ```

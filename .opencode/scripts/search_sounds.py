@@ -104,27 +104,19 @@ def search_freesound(
 def download_sound(
     sound: dict,
     output_dir: str,
-    api_key: str,
-    use_preview: bool = True
 ) -> Optional[str]:
     """
-    Download a sound file.
+    Download a sound preview file (high-quality MP3).
 
     Args:
         sound: Sound metadata from search results
         output_dir: Directory to save file
-        api_key: Freesound API key
-        use_preview: If True, download preview (no auth required). If False, download original.
 
     Returns:
         Path to downloaded file, or None if failed
     """
-    if use_preview:
-        url = sound.get("preview_url")
-        ext = ".mp3"
-    else:
-        url = sound.get("download_url")
-        ext = ".wav"
+    url = sound.get("preview_url")
+    ext = ".mp3"
 
     if not url:
         print(f"  No download URL for: {sound.get('name')}", file=sys.stderr)
@@ -138,13 +130,8 @@ def download_sound(
     # Create directory
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Download
-    headers = {}
-    if not use_preview:
-        headers["Authorization"] = f"Token {api_key}"
-
     try:
-        response = requests.get(url, headers=headers, stream=True, timeout=60)
+        response = requests.get(url, stream=True, timeout=60)
         response.raise_for_status()
 
         with open(output_path, "wb") as f:
@@ -197,10 +184,6 @@ def main():
         "--json-output",
         help="Save search results to JSON file"
     )
-    parser.add_argument(
-        "--download-original", action="store_true",
-        help="Download original files instead of previews (requires OAuth)"
-    )
 
     args = parser.parse_args()
 
@@ -215,22 +198,16 @@ def main():
             page=args.page,
         )
 
-        result["searched_at"] = datetime.utcnow().isoformat() + "Z"
+        result["searched_at"] = datetime.now(datetime.UTC).isoformat().replace("+00:00", "Z")
 
         print(f"Found {len(result['sounds'])} sounds (total available: {result['total_results']})")
 
         # Download if output directory specified
         if args.output:
-            api_key = os.environ.get("FREESOUND_API_KEY", "")
             downloaded = []
 
             for sound in result["sounds"]:
-                path = download_sound(
-                    sound,
-                    args.output,
-                    api_key,
-                    use_preview=not args.download_original
-                )
+                path = download_sound(sound, args.output)
                 if path:
                     downloaded.append(path)
 

@@ -21,6 +21,48 @@ CaroCut 是端到端的自动化视频生产平台。通过多 Agent 协作（or
 - [**从极简主义到极繁主义 - 日式网页为何如此花哨？**](https://www.bilibili.com/video/BV1BMf2B6ECR)
 - [**【论文讲解】Bézier Splatting for Fast and Differentiable Vector Graphics Rendering**](https://www.bilibili.com/video/BV1LHFVz1Ezr)
 
+
+### 调度架构
+
+```
+                         ┌─────────┐
+                         │  User   │
+                         └────┬────┘
+                              │ request / confirm
+                              ▼
+                    ┌───────────────────┐
+                    │   Orchestrator    │
+                    │                   │
+                    │  · 读取进度状态    │
+                    │  · 调度 subagent  │
+                    │  · 验证产出物     │
+                    │  · 更新 progress  │
+                    └──┬────┬────┬───┬──┘
+                       │    │    │   │
+          dispatch     │    │    │   │    callback
+       ┌───────────────┘    │    │   └───────────────┐
+       │         ┌──────────┘    └──────────┐        │
+       ▼         ▼                          ▼        ▼
+  ┌─────────┐ ┌─────────┐            ┌─────────┐ ┌──────────┐
+  │ Planner │ │  Media  │            │ Builder │ │ Reviewer │
+  │         │ │         │            │         │ │          │
+  │ step 1  │ │ step 3  │            │ step 6  │ │ step 8   │
+  │ step 2  │ │ step 4  │            │ step 7  │ │          │
+  │         │ │ step 5  │            │         │ │          │
+  └─────────┘ └─────────┘            └─────────┘ └──────────┘
+  ╔═══════════╗ ╔═══════════╗ ╔════════════════╗ ╔══════════╗
+  ║ Planning  ║ ║Enhancement║ ║Implementation  ║ ║ Delivery ║
+  ╚═══════════╝ ╚═══════════╝ ╚════════════════╝ ╚══════════╝
+
+  ──────────────────── 数据流向 ────────────────────
+
+  Planner ──manifests/──▶ Media ──raws/──▶ Builder ──project/──▶ Reviewer
+              ↑                                          │
+              │              revision_request            │
+              └──────────── Orchestrator ◀───────────────┘
+```
+
+
 ## 快速开始
 
 ### 环境要求

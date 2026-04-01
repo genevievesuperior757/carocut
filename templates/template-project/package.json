@@ -7,7 +7,7 @@
   "private": true,
   "dependencies": {
     "@remotion/cli": "4.0.417",
-    "@remotion/media-utils": "^4.0.417",
+    "@remotion/media-utils": "4.0.417",
     "@remotion/tailwind-v4": "4.0.417",
     "@remotion/transitions": "4.0.417",
     "@types/katex": "^0.16.8",
