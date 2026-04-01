@@ -113,6 +113,8 @@ OPENCODE_ENABLE_EXA=1 opencode serve --port 4096 --cors http://localhost:3000 --
 pnpm dev  # 访问 http://localhost:3000
 ```
 
+或者：使用 `sh start.sh` 快速启动前端 + opencode，
+
 ### 启动工作流
 
 在 OpenCode 界面输入 `/carocut`，系统自动执行完整视频制作流水线。
