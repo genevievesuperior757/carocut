@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react"
 import type { Event } from "@/lib/types"
+import { subscribeToAgentEventStream } from "@/lib/agent-event-stream"
 
 export type EventHandler = (event: Event) => void
 
@@ -22,20 +23,9 @@ export function useAgentEvents(
   useEffect(() => {
     if (!sessionId) return
 
-    const url = `/api/agent/events?sessionId=${encodeURIComponent(sessionId)}`
-    const es = new EventSource(url)
-
-    es.onmessage = (e: MessageEvent) => {
-      try {
-        const parsed = JSON.parse(e.data) as Event
-        handlerRef.current(parsed)
-      } catch {
-        // Ignore malformed messages
-      }
-    }
-
-    return () => {
-      es.close()
-    }
+    return subscribeToAgentEventStream({
+      sessionId,
+      onEvent: (event) => handlerRef.current(event),
+    })
   }, [sessionId])
 }
