@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react"
 import { useAgentEvents } from "./use-agent-events"
+import { buildPromptParts, type UploadedPromptFile } from "@/lib/prompt-parts"
 import type {
   Message,
   Part,
@@ -324,7 +325,7 @@ export function useOpenCodeSync(sessionId: string | null) {
       if (!sessionId) return
 
       // Upload files first if any
-      const fileParts: Array<{ type: "file"; filePath: string }> = []
+      const uploadedFiles: UploadedPromptFile[] = []
       if (files && files.length > 0) {
         for (const file of files) {
           try {
@@ -336,10 +337,25 @@ export function useOpenCodeSync(sessionId: string | null) {
               body: form,
             })
             if (uploadRes.ok) {
-              const data = await uploadRes.json()
+              const data = (await uploadRes.json()) as {
+                saved?: Array<string | { path: string; filename?: string; mime?: string }>
+              }
               if (Array.isArray(data.saved)) {
-                for (const p of data.saved) {
-                  fileParts.push({ type: "file", filePath: p })
+                for (const saved of data.saved) {
+                  if (typeof saved === "string") {
+                    uploadedFiles.push({
+                      path: saved,
+                      filename: saved.split("/").pop() || file.name,
+                      mime: file.type,
+                    })
+                    continue
+                  }
+
+                  uploadedFiles.push({
+                    path: saved.path,
+                    filename: saved.filename || file.name,
+                    mime: saved.mime || file.type,
+                  })
                 }
               }
             }
@@ -350,17 +366,12 @@ export function useOpenCodeSync(sessionId: string | null) {
       }
 
       // Build prompt parts
-      const parts: Array<Record<string, unknown>> = []
-
-      // Add subagent part if specified (invokes a subagent within the primary agent)
-      if (subagent) {
-        parts.push({ type: "agent", name: subagent })
-      }
-
-      parts.push({ type: "text", text })
-      for (const fp of fileParts) {
-        parts.push(fp)
-      }
+      const parts = buildPromptParts({
+        sessionId,
+        text,
+        subagent,
+        files: uploadedFiles,
+      })
 
       // Clear stale streaming deltas from previous message
       deltaAccRef.current.clear()

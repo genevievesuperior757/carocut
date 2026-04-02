@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     await fs.mkdir(targetDir, { recursive: true })
 
     const files = formData.getAll("files")
-    const saved: string[] = []
+    const saved: Array<{ path: string; filename: string; mime: string }> = []
 
     for (const entry of files) {
       if (!(entry instanceof File)) continue
@@ -46,7 +46,11 @@ export async function POST(req: NextRequest) {
       const filePath = path.join(targetDir, safeName)
       const buffer = Buffer.from(await entry.arrayBuffer())
       await fs.writeFile(filePath, buffer)
-      saved.push(path.join(normalizedSubdir, safeName))
+      saved.push({
+        path: path.join(normalizedSubdir, safeName),
+        filename: safeName,
+        mime: entry.type || "application/octet-stream",
+      })
     }
 
     return NextResponse.json({ saved }, { status: 201 })
